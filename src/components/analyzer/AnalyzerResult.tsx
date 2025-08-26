@@ -1,103 +1,93 @@
 "use client";
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Sparkles, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
-import ScoreCircle from "./ScoreCircle";
-import CategoryScore from "./CategoryScore";
+import React, { useState } from 'react';
+import { CheckSquare, AlertCircle, Star, Brain } from "lucide-react";
+import OverallScoreCard from "./result/OverallScoreCard";
+import MarketCompetitivenessCard from "./result/MarketCompetitivenessCard";
+import CategoryScoresGrid from "./result/CategoryScoresGrid";
+import AccordionSection from "./result/AccordionSection";
+import PrioritySuggestions from "./result/PrioritySuggestions";
+import CriticalGaps from "./result/CriticalGaps";
+import CompetitiveAdvantages from "./result/CompetitiveAdvantages";
+import ActionPlan from "./result/ActionPlan";
 
 function AnalyzerResult({ result, history }: { result: any, history: any[] | undefined}) {
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    suggestions: true,
+    gaps: false,
+    advantages: false,
+    nextSteps: false
+  });
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   return (
-    <div className="space-y-8">
-      <Card className="bg-gray-800/40 border-gray-700/50">
-        <CardHeader>
-             <div className="flex justify-between items-center">
-            <CardTitle className="text-3xl text-white flex items-center gap-3">
-              <Sparkles size={28} className="text-yellow-300" />
-              Resume Analysis Report
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-10">
-          {/* Overall Score & Summary */}
-          <div className="flex flex-col md:flex-row items-center gap-8 p-6 bg-gray-900/30 rounded-lg border border-gray-700/50">
-            <ScoreCircle score={result.overall_score} />
-            <div className="flex-1">
-              <h3 className="text-2xl font-bold text-white mb-2">Overall Match</h3>
-              <p className="text-slate-300 mb-4">{result.summary}</p>
-              <div className="p-4 bg-gray-800/50 rounded-md">
-                <h4 className="font-semibold text-purple-400 mb-1">Recruiter's First Impression:</h4>
-                <p className="text-slate-300 italic">"{result.first_impression}"</p>
-              </div>
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Overall Score Card */}
+      <OverallScoreCard result={result} />
 
-          {/* Categorical Scores & ATS */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <h4 className="text-xl font-semibold text-white flex items-center gap-2"><BarChart size={20} /> Categorical Breakdown</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {result.categorical_scores.map((cat: any) => <CategoryScore key={cat.category} {...cat} />)}
-              </div>
-            </div>
-            <div className="p-6 bg-gray-900/50 rounded-lg border border-gray-700/50">
-              <h4 className="text-xl font-semibold text-white mb-3">ATS Compatibility</h4>
-              <div className="flex items-center gap-4 mb-4">
-                <div className={`text-3xl font-bold ${result.ats_compatibility.score > 70 ? 'text-green-400' : 'text-yellow-400'}`}>
-                  {result.ats_compatibility.score}%
-                </div>
-                <p className="text-slate-400 text-sm">Your resume's compatibility with Applicant Tracking Systems.</p>
-              </div>
-              <div className="space-y-2">
-                {result.ats_compatibility.suggestions.map((sugg: string, index: number) => (
-                  <div key={index} className="flex items-start gap-2 text-sm text-slate-300">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
-                    <span>{sugg}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+      {/* Market Competitiveness */}
+      {result.market_competitiveness && (
+        <MarketCompetitivenessCard 
+          marketData={result.market_competitiveness} 
+          atsScore={result.ats_compatibility?.score || 0} 
+        />
+      )}
 
+      {/* Category Scores */}
+      <CategoryScoresGrid categories={result.categorical_scores || []} />
 
-          {/* Missing Keywords */}
-          {result.missing_keywords.length > 0 && (
-            <div>
-              <h4 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
-                <AlertCircle size={20} className="text-red-400" /> Missing Keywords
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {result.missing_keywords.map((keyword: string) => (
-                  <span key={keyword} className="px-3 py-1 bg-red-500/20 text-red-300 text-sm font-medium rounded-full border border-red-500/30">{keyword}</span>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Priority Improvements - Accordion */}
+      <AccordionSection
+        title="Top Priority Fixes"
+        isExpanded={expandedSections.suggestions}
+        onToggle={() => toggleSection('suggestions')}
+        icon={<CheckSquare className="h-5 w-5 text-blue-400" />}
+        badge={`${result.actionable_suggestions?.length || 0} items`}
+      >
+        <PrioritySuggestions suggestions={result.actionable_suggestions || []} />
+      </AccordionSection>
 
-          {/* Actionable Suggestions */}
-          <div>
-            <h4 className="text-xl font-semibold text-white mb-4">Actionable Suggestions</h4>
-            <div className="space-y-4">
-              {result.actionable_suggestions.map((sugg: any, index: number) => (
-                <div key={index} className="p-4 bg-gray-900/50 rounded-lg border border-gray-700">
-                  <p className="font-semibold text-purple-400 text-lg mb-2">{sugg.area}</p>
-                  <p className="text-white mb-3">{sugg.suggestion}</p>
-                  {sugg.example.before && (
-                    <div className="p-2 bg-red-900/30 rounded-md mb-2">
-                      <p className="text-sm text-red-300 italic">"<del>{sugg.example.before}</del>"</p>
-                    </div>
-                  )}
-                  <div className="p-2 bg-green-900/30 rounded-md flex items-center gap-2">
-                    <ArrowRight size={16} className="text-green-400" />
-                    <p className="text-sm text-green-300 italic">"{sugg.example.after}"</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Critical Gaps - Accordion */}
+      <AccordionSection
+        title="What's Missing"
+        isExpanded={expandedSections.gaps}
+        onToggle={() => toggleSection('gaps')}
+        icon={<AlertCircle className="h-5 w-5 text-red-400" />}
+      >
+        <CriticalGaps gaps={result.critical_gaps} />
+      </AccordionSection>
+
+      {/* Competitive Advantages - Accordion */}
+      {result.competitive_advantages?.length > 0 && (
+        <AccordionSection
+          title="Your Strengths"
+          isExpanded={expandedSections.advantages}
+          onToggle={() => toggleSection('advantages')}
+          icon={<Star className="h-5 w-5 text-yellow-400" />}
+          badge={`${result.competitive_advantages.length} strengths`}
+        >
+          <CompetitiveAdvantages advantages={result.competitive_advantages} />
+        </AccordionSection>
+      )}
+
+      {/* Action Plan - Accordion */}
+      {result.next_steps?.length > 0 && (
+        <AccordionSection
+          title="Your Action Plan"
+          isExpanded={expandedSections.nextSteps}
+          onToggle={() => toggleSection('nextSteps')}
+          icon={<Brain className="h-5 w-5 text-green-400" />}
+          badge="Priority Order"
+        >
+          <ActionPlan steps={result.next_steps} />
+        </AccordionSection>
+      )}
     </div>
   );
 }
