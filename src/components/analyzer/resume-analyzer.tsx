@@ -72,19 +72,20 @@ export function ResumeAnalyzer({ onAnalysisComplete }: ResumeAnalyzerProps) {
       }
 
 
+ 
       const result = await analyze({
         resumeText: resumeText,
         jobDescriptionText: jobDescriptionText,
       });
 
-      await saveAnalysis({
+     await saveAnalysis({
         jobDescription: jobDescriptionText.substring(0, 1000), // Truncate for storage
         resumeText: resumeText.substring(0, 1000), // Truncate for storage
         analysis: result,
-        overallScore: result.overall_score,
+        overallScore: result.overallScore, // FIX: Changed from result.overall_score
       });
 
-      onAnalysisComplete(result, resumeText);
+     onAnalysisComplete(result, resumeText);
     } catch (error) {
       console.error("Analysis failed:", error);
       toast.error("An error occurred during analysis. Please try again.");

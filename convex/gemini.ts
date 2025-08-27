@@ -127,7 +127,7 @@ export const saveAnalysis = mutation({
         jobDescription: v.string(),
         resumeText: v.string(),
         analysis: v.any(),
-        overallScore: v.number(),
+        overallScore: v.number(), // Re-add this line
     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
@@ -135,6 +135,7 @@ export const saveAnalysis = mutation({
             throw new Error("Unauthorized");
         }
 
+        // The ...args spread will now correctly include overallScore
         await ctx.db.insert("analyses", {
             userId: identity.subject,
             ...args,
