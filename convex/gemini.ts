@@ -127,7 +127,8 @@ export const saveAnalysis = mutation({
         jobDescription: v.string(),
         resumeText: v.string(),
         analysis: v.any(),
-        overallScore: v.number(), // Re-add this line
+        overallScore: v.number(),
+        resumeImageFile: v.any()
     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();

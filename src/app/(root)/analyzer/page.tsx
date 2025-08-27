@@ -30,7 +30,7 @@ export default function AnalyzerPage() {
 
   const handleSelectHistoryItem = (id: Id<"analyses"> | "new") => {
     setSelectedAnalysisId(id);
-    setActiveTab("result"); // Ensure we are on the result tab
+    setActiveTab("result"); 
   };
 
   const displayedAnalysis = selectedAnalysisId === "new"

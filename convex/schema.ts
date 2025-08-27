@@ -39,5 +39,6 @@ export default defineSchema({
         resumeText: v.string(),
         analysis: v.any(), 
         overallScore: v.number(),
+        resumeImageFile: v.optional(v.any())
       }).index("by_user_id", ["userId"]),
 })
