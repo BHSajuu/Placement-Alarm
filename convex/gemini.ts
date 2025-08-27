@@ -6,6 +6,51 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
+export const AIResponseFormat = `
+      interface Feedback {
+      overallScore: number; //max 100
+      ATS: {
+        score: number; //rate based on ATS suitability
+        tips: {
+          type: "good" | "improve";
+          tip: string; //give 3-4 tips
+        }[];
+      };
+      toneAndStyle: {
+        score: number; //max 100
+        tips: {
+          type: "good" | "improve";
+          tip: string; //make it a short "title" for the actual explanation
+          explanation: string; //explain in detail here
+        }[]; //give 3-4 tips
+      };
+      content: {
+        score: number; //max 100
+        tips: {
+          type: "good" | "improve";
+          tip: string; //make it a short "title" for the actual explanation
+          explanation: string; //explain in detail here
+        }[]; //give 3-4 tips
+      };
+      structure: {
+        score: number; //max 100
+        tips: {
+          type: "good" | "improve";
+          tip: string; //make it a short "title" for the actual explanation
+          explanation: string; //explain in detail here
+        }[]; //give 3-4 tips
+      };
+      skills: {
+        score: number; //max 100
+        tips: {
+          type: "good" | "improve";
+          tip: string; //make it a short "title" for the actual explanation
+          explanation: string; //explain in detail here
+        }[]; //give 3-4 tips
+      };
+    }`;
+
+
 export const analyzeResume = action({
   args: {
     resumeText: v.string(),
@@ -33,77 +78,18 @@ export const analyzeResume = action({
       - Global hiring standards and cultural fit assessment
       
       ANALYSIS MISSION:
-      Conduct a comprehensive, brutally honest, and strategically-focused analysis of this resume against the provided job description. Your evaluation should be:
-      - Ruthlessly critical yet constructive
-      - Highly specific with actionable recommendations
-      - Industry-aware and role-appropriate
-      - ATS-optimized for modern recruitment systems
-      - Results-oriented with measurable improvement suggestions
-
-      The output MUST be a single, valid JSON object with no markdown formatting.
-
-      The JSON structure must be as follows:
-      {
-        "overall_score": number, // Holistic score (0-100) based on weighted analysis: Technical Skills (30%), Experience Relevance (25%), Impact & Results (20%), ATS Compatibility (15%), Cultural Fit (10%)
-        "summary": string, // Executive summary (150-200 words) with clear verdict on candidacy strength, top 3 strengths, top 3 critical gaps, and hiring recommendation
-        "first_impression": string, // Recruiter's 15-second scan impression - what immediately stands out (positive/negative), visual appeal, and initial screening decision
-        "market_competitiveness": {
-          "score": number, // 0-100 score for market competitiveness
-          "analysis": string, // How this resume compares to typical candidates for this role
-          "salary_bracket": string, // Estimated salary range this resume could command
-          "improvement_potential": string // Potential score increase with improvements
-        },
-        "ats_compatibility": {
-          "score": number, // ATS parsing and keyword optimization score (0-100)
-          "parsing_issues": string[], // Specific formatting/structure issues that hurt ATS parsing
-          "keyword_density": string, // Analysis of keyword usage vs. job requirements
-          "suggestions": string[] // Specific ATS optimization recommendations
-        },
-        "categorical_scores": [
-          { "category": "Technical Skills Match", "score": number, "explanation": string, "improvement_impact": string },
-          { "category": "Experience Relevance", "score": number, "explanation": string, "improvement_impact": string },
-          { "category": "Impact & Quantifiable Results", "score": number, "explanation": string, "improvement_impact": string },
-          { "category": "Leadership & Soft Skills", "score": number, "explanation": string, "improvement_impact": string },
-          { "category": "Education & Certifications", "score": number, "explanation": string, "improvement_impact": string },
-          { "category": "Industry Knowledge", "score": number, "explanation": string, "improvement_impact": string }
-        ],
-        "critical_gaps": {
-          "missing_keywords": string[], // High-impact keywords/skills missing from resume
-          "experience_gaps": string[], // Required experience types not demonstrated
-          "qualification_gaps": string[], // Missing certifications, education, or credentials
-          "soft_skill_gaps": string[] // Leadership, communication, or cultural fit gaps
-        },
-        "competitive_advantages": string[], // Unique strengths that set this candidate apart
-        "actionable_suggestions": [
-          {
-            "priority": string, // "HIGH", "MEDIUM", "LOW" - impact on hiring decision
-            "area": string, // Specific resume section or aspect to improve
-            "issue": string, // What's wrong or missing
-            "suggestion": string, // Detailed, actionable improvement recommendation
-            "impact": string, // Expected improvement in score/competitiveness
-            "example": {
-              "before": string, // Current text or "N/A" if adding new content
-              "after": string // Specific improved version with exact wording
-            }
-          }
-        ],
-        "interview_preparation": {
-          "likely_questions": string[], // 5 most likely interview questions based on gaps/strengths
-          "story_suggestions": string[], // STAR method stories to prepare based on experience
-          "technical_prep": string[] // Technical areas to brush up on for this role
-        },
-        "next_steps": string[] // Prioritized action plan for resume improvement (top 5 items)
-      }
-
-      EVALUATION CRITERIA:
-      1. Technical Competency: Does the candidate demonstrate required technical skills with concrete examples?
-      2. Experience Depth: Is the experience level and type aligned with job requirements?
-      3. Impact Demonstration: Are achievements quantified with metrics, percentages, dollar amounts?
-      4. Cultural Alignment: Do soft skills and work style match company culture indicators?
-      5. Growth Trajectory: Does career progression show upward mobility and increasing responsibility?
-      6. Industry Relevance: Is domain knowledge appropriate for the sector/company?
-      7. Communication Skills: Is the resume well-written, clear, and professional?
-      8. Differentiation: What makes this candidate unique compared to typical applicants?
+      Please analyze and rate this resume and suggest how to improve it.
+      The rating can be low if the resume is bad.
+      Be thorough and detailed. Don't be afraid to point out any mistakes or areas for improvement.
+      If there is a lot to improve, don't hesitate to give low scores. This is to help the user to improve their resume.
+      If available, use the job description for the job user is applying to to give more detailed feedback.
+      If provided, take the job description into consideration.
+     
+      FORMAT:
+      Provide the feedback using the following format:
+      ${AIResponseFormat}
+      Return the analysis as an JSON object, without any other text and without the backticks.
+      Do not include any other text or comments.
 
       ANALYSIS INSTRUCTIONS:
       - Be ruthlessly honest but constructive
@@ -126,7 +112,7 @@ export const analyzeResume = action({
 
     try {
       const result = await model.generateContent(prompt);
-      const response = await result.response;
+      const response = result.response;
       const jsonResponse = response.text();
       return JSON.parse(jsonResponse);
     } catch (error) {

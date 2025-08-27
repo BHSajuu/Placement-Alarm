@@ -36,7 +36,7 @@ export default function AnalyzerPage() {
   const displayedAnalysis = selectedAnalysisId === "new"
     ? currentAnalysis
     : analysisHistory.find(a => a._id === selectedAnalysisId)?.analysis;
-  
+
   const displayedResumeText = selectedAnalysisId === "new"
     ? originalResumeText
     : analysisHistory.find(a => a._id === selectedAnalysisId)?.resumeText;
@@ -61,13 +61,13 @@ export default function AnalyzerPage() {
           <TabsContent value="analyzer">
             <ResumeAnalyzer onAnalysisComplete={handleAnalysisComplete} />
           </TabsContent>
-      <TabsContent value="result" className="focus-visible:ring-0">
+          <TabsContent value="result" className="focus-visible:ring-0">
             <div className="flex flex-col lg:flex-row gap-8">
               <div className="flex-grow">
                 {displayedAnalysis ? (
                   <AnalyzerResult
                     result={displayedAnalysis}
-                    history={analysisHistory}
+                    
                   />
                 ) : (
                   <div className="text-center py-16 mt-8 bg-gray-800/30 rounded-lg h-full flex flex-col justify-center">

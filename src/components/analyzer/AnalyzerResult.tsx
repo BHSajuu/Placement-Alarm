@@ -1,95 +1,49 @@
-"use client";
+import Link from 'next/link'
+import React from 'react'
+import Summary from './Result/Summary'
+import ATS from './Result/ATS'
+import Details from './Result/Details'
 
-import React, { useState } from 'react';
-import { CheckSquare, AlertCircle, Star, Brain } from "lucide-react";
-import OverallScoreCard from "./result/OverallScoreCard";
-import MarketCompetitivenessCard from "./result/MarketCompetitivenessCard";
-import CategoryScoresGrid from "./result/CategoryScoresGrid";
-import AccordionSection from "./result/AccordionSection";
-import PrioritySuggestions from "./result/PrioritySuggestions";
-import CriticalGaps from "./result/CriticalGaps";
-import CompetitiveAdvantages from "./result/CompetitiveAdvantages";
-import ActionPlan from "./result/ActionPlan";
-
-function AnalyzerResult({ result, history }: { result: any, history: any[] | undefined}) {
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    suggestions: true,
-    gaps: false,
-    advantages: false,
-    nextSteps: false
-  });
-
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
-
+function AnalyzerResult({result}:{result:any}) {
+ 
+ 
   return (
-    <div className="space-y-6">
-      {/* Overall Score Card */}
-      <OverallScoreCard result={result} />
-
-      {/* Market Competitiveness */}
-      {result.market_competitiveness && (
-        <MarketCompetitivenessCard 
-          marketData={result.market_competitiveness} 
-          atsScore={result.ats_compatibility?.score || 0} 
-        />
-      )}
-
-      {/* Category Scores */}
-      <CategoryScoresGrid categories={result.categorical_scores || []} />
-
-      {/* Priority Improvements - Accordion */}
-      <AccordionSection
-        title="Top Priority Fixes"
-        isExpanded={expandedSections.suggestions}
-        onToggle={() => toggleSection('suggestions')}
-        icon={<CheckSquare className="h-5 w-5 text-blue-400" />}
-        badge={`${result.actionable_suggestions?.length || 0} items`}
-      >
-        <PrioritySuggestions suggestions={result.actionable_suggestions || []} />
-      </AccordionSection>
-
-      {/* Critical Gaps - Accordion */}
-      <AccordionSection
-        title="What's Missing"
-        isExpanded={expandedSections.gaps}
-        onToggle={() => toggleSection('gaps')}
-        icon={<AlertCircle className="h-5 w-5 text-red-400" />}
-      >
-        <CriticalGaps gaps={result.critical_gaps} />
-      </AccordionSection>
-
-      {/* Competitive Advantages - Accordion */}
-      {result.competitive_advantages?.length > 0 && (
-        <AccordionSection
-          title="Your Strengths"
-          isExpanded={expandedSections.advantages}
-          onToggle={() => toggleSection('advantages')}
-          icon={<Star className="h-5 w-5 text-yellow-400" />}
-          badge={`${result.competitive_advantages.length} strengths`}
-        >
-          <CompetitiveAdvantages advantages={result.competitive_advantages} />
-        </AccordionSection>
-      )}
-
-      {/* Action Plan - Accordion */}
-      {result.next_steps?.length > 0 && (
-        <AccordionSection
-          title="Your Action Plan"
-          isExpanded={expandedSections.nextSteps}
-          onToggle={() => toggleSection('nextSteps')}
-          icon={<Brain className="h-5 w-5 text-green-400" />}
-          badge="Priority Order"
-        >
-          <ActionPlan steps={result.next_steps} />
-        </AccordionSection>
-      )}
-    </div>
-  );
+    <main className="!pt-0">
+            <nav className="resume-nav">
+                <Link href="/analyzer" className="back-button">
+                    <img src="/icons/back.svg" alt="logo" className="w-2.5 h-2.5" />
+                    <span className="text-gray-800 text-sm font-semibold">Back to Homepage</span>
+                </Link>
+            </nav>
+            <div className="flex flex-row w-full max-lg:flex-col-reverse">
+                {/* <section className="feedback-section bg-[url('/images/bg-small.svg') bg-cover h-[100vh] sticky top-0 items-center justify-center">
+                    {imageUrl && resumeUrl && (
+                        <div className="animate-in fade-in duration-1000 gradient-border max-sm:m-0 h-[90%] max-wxl:h-fit w-fit">
+                            <a href={resumeUrl} target="_blank" rel="noopener noreferrer">
+                                <img
+                                    src={imageUrl}
+                                    className="w-full h-full object-contain rounded-2xl"
+                                    title="resume"
+                                />
+                            </a>
+                        </div>
+                    )}
+                </section> */}
+                <section className="feedback-section">
+                    <h2 className="text-4xl !text-black font-bold">Resume Review</h2>
+                    {result ? (
+                        <div className="flex flex-col gap-8 animate-in fade-in duration-1000">
+                            <Summary feedback={result} />
+                            <ATS score={result.ATS.score || 0} suggestions={result.ATS.tips || []} />
+                            <Details feedback={result} />
+                        </div>
+                    ) : (
+                        <img src="/resume-scan-2.gif" className="w-full" />
+                    )}
+                </section>
+            </div>
+        </main>
+  )
 }
 
-export default AnalyzerResult;
+export default AnalyzerResult
