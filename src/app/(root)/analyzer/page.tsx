@@ -44,7 +44,7 @@ export default function AnalyzerPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="text-center space-y-4 mb-12">
+        <div className="text-center space-y-4 mb-5">
           <h1 className="text-5xl font-bold text-white tracking-tight">
             Optimize Your Resume
           </h1>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FileUp, Loader2, Wand2 } from "lucide-react";
+import { FileUp, Wand2 } from "lucide-react";
 import { useAction, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import mammoth from "mammoth";
@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import FileUploadZone from "./FileUploadZone";
 import JobDescriptionInput from "./JobDesInput";
 import { convertPdfToImage } from "@/lib/pdf2img";
+import Image from "next/image";
 
 interface ResumeAnalyzerProps {
   onAnalysisComplete: (result: any, resumeText: string) => void;
@@ -110,10 +111,17 @@ export function ResumeAnalyzer({ onAnalysisComplete }: ResumeAnalyzerProps) {
   return (
     <div className="space-y-8">
       {isLoading ? (
-        <>
-          <h2>{statusText}</h2>
-          <img src="/images/resume-scan.gif" className="w-full" />
-        </>
+        <div className="flex flex-col items-center justify-center -gap-32">
+          <p className="text-center text-3xl animate-pulse font-stretch-condensed mt-14">{statusText}</p>
+         <div className="-my-16 flex items-center justify-center">
+            <Image
+            alt="Resume scan animation"
+            src="/images/resume-scan.gif"
+            width={750}
+            height={750}
+          />
+         </div>
+        </div>
       )
         :
         (
