@@ -61,11 +61,9 @@ export function ResumeAnalyzer({ onAnalysisComplete }: ResumeAnalyzerProps) {
         return;
       }
 
-      setStatusText('Converting to image...');
       const resumeImageFile = await convertPdfToImage(resumeFile)
 
 
-      setStatusText('Preparing data...');
       let jobDescriptionText = jobDescription;
       if (jobDescriptionFile) {
         if (jobDescriptionFile.type === "application/pdf") {
@@ -88,7 +86,7 @@ export function ResumeAnalyzer({ onAnalysisComplete }: ResumeAnalyzerProps) {
         jobDescriptionText: jobDescriptionText,
       });
 
-      setStatusText('Saving the analysis...');
+      setStatusText('Analysis complete, rendering results page...');
       await saveAnalysis({
         jobDescription: jobDescriptionText.substring(0, 1000), 
         resumeText: resumeText.substring(0, 1000), 
@@ -96,7 +94,6 @@ export function ResumeAnalyzer({ onAnalysisComplete }: ResumeAnalyzerProps) {
         overallScore: result.overallScore, 
         resumeImageFile: resumeImageFile,
       });
-      setStatusText('Analysis complete, rendering results...');
       onAnalysisComplete(result, resumeText);
     } catch (error) {
       console.error("Analysis failed:", error);
