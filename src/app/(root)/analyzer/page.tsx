@@ -16,14 +16,12 @@ type ActiveView = "analyzer" | "result";
 export default function AnalyzerPage() {
   const [activeTab, setActiveTab] = useState<ActiveView>("analyzer");
   const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
-  const [originalResumeText, setOriginalResumeText] = useState<string>("");
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<Id<"analyses"> | "new" | null>(null);
 
   const analysisHistory = useQuery(api.gemini.getAnalysisHistory) || [];
 
   const handleAnalysisComplete = (result: any, resumeText: string) => {
     setCurrentAnalysis(result);
-    setOriginalResumeText(resumeText);
     setSelectedAnalysisId("new");
     setActiveTab("result");
   };
@@ -37,23 +35,18 @@ export default function AnalyzerPage() {
     ? currentAnalysis
     : analysisHistory.find(a => a._id === selectedAnalysisId)?.analysis;
 
-  const displayedResumeText = selectedAnalysisId === "new"
-    ? originalResumeText
-    : analysisHistory.find(a => a._id === selectedAnalysisId)?.resumeText;
-
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <div className="text-center space-y-4 mb-5">
+    <div className="pt-10 px-12">
+        {/* <div className="text-center space-y-1 mb-5">
           <h1 className="text-5xl font-bold text-white tracking-tight">
             Optimize Your Resume
           </h1>
           <p className="text-xl text-gray-400 max-w-4xl mx-auto leading-relaxed">
             Get AI-powered insights on how well your resume matches any job description, with specific suggestions for improvement.
           </p>
-        </div>
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ActiveView)}>
-          <TabsList className="pb-11 px-6 grid w-full grid-cols-2 gap-6 mb-4 bg-gray-700/50 border border-gray-600/50">
+        </div> */}
+        <Tabs  value={activeTab} onValueChange={(value) => setActiveTab(value as ActiveView)}>
+          <TabsList className="ml-36 pb-12 pt-2 px-3 grid w-[80%] grid-cols-2 gap-6 mb-4 bg-gray-700/50 border border-gray-600/50">
             <TabsTrigger value="analyzer" className={`p-2 ${activeTab === "analyzer" ? "text-black" : "text-white"}`}>Analyzer</TabsTrigger>
             <TabsTrigger value="result" className={`p-2 ${activeTab === "result" ? "text-black" : "text-white"}`}>Results</TabsTrigger>
           </TabsList>
@@ -89,6 +82,5 @@ export default function AnalyzerPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
   );
 }
