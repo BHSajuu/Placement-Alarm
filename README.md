@@ -30,6 +30,3 @@ A platform to help students track and manage their placement process effectively
 * **Notification Timing:** Adjust the notification timing to send reminders at 60-minute intervals.
 
 
-
-
-   - Option to download the improved resume version (optional bonus feature).  
