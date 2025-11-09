@@ -163,11 +163,6 @@ export const incrementReminderCount = mutation({
 export const getPaginatedCompanies = query({
   args: {
     userId: v.string(),
-    filters: v.object({
-      search: v.string(),
-      status: v.string(),
-      driveType: v.string(),
-    }),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
@@ -176,74 +171,11 @@ export const getPaginatedCompanies = query({
       throw new Error("Unauthorized");
     }
 
-    // Use search index if search is provided, otherwise use regular index
-    if (args.filters.search) {
-      // Search by name and role separately, then combine results
-      // Search by name
-      const nameResults = await ctx.db
-        .query("companies")
-        .withSearchIndex("by_name", (q) => q.search("name", args.filters.search))
-        .filter((q) => q.eq(q.field("userId"), args.userId))
-        .collect();
-      
-      // Search by role
-      const roleResults = await ctx.db
-        .query("companies")
-        .withSearchIndex("by_role", (q) => q.search("role", args.filters.search))
-        .filter((q) => q.eq(q.field("userId"), args.userId))
-        .collect();
-      
-      // Combine and deduplicate by _id
-      const combined = [...nameResults, ...roleResults];
-      const uniqueResults = Array.from(
-        new Map(combined.map((item) => [item._id, item])).values()
-      );
-      
-      // Apply additional filters in memory
-      let filtered = uniqueResults;
-      
-      if (args.filters.status !== "all") {
-        filtered = filtered.filter((company) => company.status === args.filters.status);
-      }
-      
-      if (args.filters.driveType !== "all") {
-        const driveType = args.filters.driveType.toLowerCase().replace(/-/g, "");
-        filtered = filtered.filter(
-          (company) => company.driveType.toLowerCase().replace(/-/g, "") === driveType
-        );
-      }
-      
-      // Sort by creation time (desc) and paginate manually
-      filtered.sort((a, b) => b._creationTime - a._creationTime);
-      const { numItems, cursor } = args.paginationOpts;
-      const start = cursor ? parseInt(cursor, 10) : 0;
-      const end = start + numItems;
-      const paginatedResults = filtered.slice(start, end);
-      const isDone = end >= filtered.length;
-      
-      return {
-        page: paginatedResults,
-        continueCursor: isDone ? "" : String(end),
-        isDone,
-      };
-    }
-    
-    // Regular query with index when no search
-    let query = ctx.db
-      .query("companies")
-      .withIndex("by_user_id", (q) => q.eq("userId", args.userId));
-
-    // Apply status filter
-    if (args.filters.status !== "all") {
-      query = query.filter((q) => q.eq(q.field("status"), args.filters.status));
-    }
-
-    // Apply driveType filter
-    if (args.filters.driveType !== "all") {
-      const driveType = args.filters.driveType.toLowerCase().replace(/-/g, "");
-      query = query.filter((q) => q.eq(q.field("driveType"), driveType));
-    }
-    
-    return await query.order("desc").paginate(args.paginationOpts);
+    return await ctx.db
+                    .query("companies")
+                    .withIndex("by_user_id")
+                    .filter((q)=> q.eq(q.field("userId"), args.userId))
+                    .order("desc")
+                    .paginate(args.paginationOpts);
   },
 });
