@@ -23,7 +23,13 @@ export default defineSchema({
             remindersSent: v.optional(v.number()),
             lastReminderAt: v.optional(v.string()),
       }).index("by_user_id", ["userId"])
-        .index("by_deadline", ["deadline"]),
+        .index("by_deadline", ["deadline"])
+        .searchIndex("by_name", {
+            searchField: "name"
+        })
+        .searchIndex("by_role", {
+            searchField: "role"
+        }),
 
       profiles: defineTable({
             userId: v.string(),

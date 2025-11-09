@@ -17,7 +17,8 @@ import { formatDate } from "@/lib/utils"
 import { Building2 } from "lucide-react"
 import toast from "react-hot-toast"
 import { StatusUpdateModal } from "./status-update-modal"
-import {  useMutation, useQuery } from "convex/react"
+// --- IMPORT CHANGED ---
+import {  useMutation, usePaginatedQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import {  useUser, useAuth } from "@clerk/nextjs"
 import { Id } from "../../../convex/_generated/dataModel"
@@ -41,29 +42,26 @@ export function CompanyTable({ filters }: CompanyTableProps) {
   const { user , isLoaded} = useUser()
   const { isSignedIn } = useAuth()
 
-  const companies = useQuery(
-    api.companies.getAllCompanies,
-    isSignedIn && user?.id ? { userId: user.id } : "skip"
-  ) 
+  // --- UPDATED TO PAGINATED QUERY ---
+  const {
+    results: companies, // This is our array of companies
+    status: paginationStatus,
+    loadMore,
+  } = usePaginatedQuery(
+    api.companies.getPaginatedCompanies, // Use the new query
+    isSignedIn && user?.id 
+      ? { userId: user.id, filters: filters } // Pass filters to the backend
+      : "skip",
+    { initialNumItems: 10 } // Fetch 10 items initially
+  ); 
+  // --- END OF UPDATE ---
 
 
   const deleteCompany = useMutation(api.companies.deleteCompany);
   
-  const filteredCompanies = companies?.filter((company) => {
-    const matchesSearch =
-      company.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-      company.role.toLowerCase().includes(filters.search.toLowerCase())
-    const matchesStatus =
-      filters.status === "all" ||
-      company.status?.toLowerCase() === filters.status
-    const matchesDriveType =
-      filters.driveType === "all" ||
-      company.driveType
-        .toLowerCase()
-        .replace("-", "") === filters.driveType.replace("-", "")
-
-    return matchesSearch && matchesStatus && matchesDriveType
-  })
+  // --- CLIENT-SIDE FILTERING REMOVED ---
+  // const filteredCompanies = ... (This is no longer needed)
+  // ---
 
   const handleDelete = async (companyId: Id<"companies">) => {
     try {
@@ -105,14 +103,10 @@ export function CompanyTable({ filters }: CompanyTableProps) {
         return "bg-blue-500/20 text-blue-400 border-blue-500/30"
       case "Shortlisted":
         return "bg-orange-500/20 text-orange-400 border-orange-500/30"
-      case "Not Shortlisted":
-        return "bg-red-300/20 text-orange-400 border-orange-500/30"
       case "Pre Placement Talk":
         return "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
       case "OA":
         return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30"
-      case "OA not clear":
-        return "bg-yellow-600/20 text-cyan-400 border-cyan-500/30"
       case "Aptitude round":
         return "bg-teal-500/20 text-teal-400 border-teal-500/30"
       case "GD":
@@ -131,7 +125,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
   }
 
 
-  //  Not signed in?
+  //  Not signed in? (This logic is unchanged)
   if (!user) {
     return (
       <div className="text-center py-16" style={{
@@ -147,7 +141,8 @@ export function CompanyTable({ filters }: CompanyTableProps) {
     )
   }
 
-    //  Signed in, but either Clerk is still loading *or* Convex hasn't returned data
+  //  Signed in, but either Clerk is still loading *or* Convex hasn't returned data
+  //  (This logic is unchanged, 'companies' will be undefined while loading first page)
   if (!isLoaded || companies === undefined) {
     return <CompaniesTableSkeleton rows={5} />
   }
@@ -177,7 +172,8 @@ export function CompanyTable({ filters }: CompanyTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredCompanies?.map((company, index) => (
+            {/* --- MAP 'companies' INSTEAD OF 'filteredCompanies' --- */}
+            {companies.map((company, index) => (
               <TableRow
                 key={company._id}
                 className="border-gray-700/50 hover:bg-gray-800/30 transition-all duration-300 hover:shadow-lg"
@@ -279,7 +275,25 @@ export function CompanyTable({ filters }: CompanyTableProps) {
         </Table>
       </div>
 
-      {/* Full note popup with portal */}
+      {/* --- ADD LOAD MORE BUTTON --- */}
+      <div className="mt-4 flex justify-center">
+        {paginationStatus === "CanLoadMore" && (
+          <Button
+            variant="outline"
+            onClick={() => loadMore(10)} // Load 10 more items
+            className="text-white bg-gray-700/50 border-gray-600 hover:bg-gray-700"
+          >
+            Load More
+          </Button>
+        )}
+        {paginationStatus === "LoadingMore" && (
+           <div className="text-gray-400">Loading...</div>
+        )}
+      </div>
+      {/* --- END LOAD MORE BUTTON --- */}
+
+
+      {/* Full note popup with portal (Unchanged) */}
       {showFullNote &&
         createPortal(
           <div
@@ -320,18 +334,22 @@ export function CompanyTable({ filters }: CompanyTableProps) {
           name: c.name,
           status: c.status ?? "",
           statusDateTime: c.statusDateTime,
-          note: c.notes ?? ""
+          note: c.notes
         }))}
       />
     </>
   )}else{
+    // This 'else' block now handles the 'companies.length === 0' case
     return (
     <div className="text-center py-16 animate-fadeIn">
       <div className="mx-auto h-16 w-16 bg-gradient-to-r from-gray-700 to-gray-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
         <Building2 className="h-6 w-6 text-gray-400" />
       </div>
+      {/* --- UPDATED EMPTY STATE TEXT --- */}
       <p className="text-gray-300 text-lg font-medium">
-        No companies added yet. Click "Add Company" to get started!
+        {filters.search || filters.status !== 'all' || filters.driveType !== 'all'
+          ? "No companies found matching your filters."
+          : 'No companies added yet. Click "Add Company" to get started!'}
       </p>
     </div>
   )
