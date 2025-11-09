@@ -105,10 +105,14 @@ export function CompanyTable({ filters }: CompanyTableProps) {
         return "bg-blue-500/20 text-blue-400 border-blue-500/30"
       case "Shortlisted":
         return "bg-orange-500/20 text-orange-400 border-orange-500/30"
+      case "Not Shortlisted":
+        return "bg-red-300/20 text-orange-400 border-orange-500/30"
       case "Pre Placement Talk":
         return "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
       case "OA":
         return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30"
+      case "OA not clear":
+        return "bg-yellow-600/20 text-cyan-400 border-cyan-500/30"
       case "Aptitude round":
         return "bg-teal-500/20 text-teal-400 border-teal-500/30"
       case "GD":
@@ -316,7 +320,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
           name: c.name,
           status: c.status ?? "",
           statusDateTime: c.statusDateTime,
-          note: c.notes
+          note: c.notes ?? ""
         }))}
       />
     </>

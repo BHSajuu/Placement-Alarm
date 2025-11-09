@@ -45,6 +45,7 @@ export function StatusUpdateModal({
   const [timeHour, setTimeHour] = useState("");
   const [timeMinute, setTimeMinute] = useState("");
   const [timeAmPm, setTimeAmPm] = useState("AM");
+
   const company = companies.find((c) => c._id === companyId);
 
   const updateCompanyDetails = useMutation(api.companies.updateCompanyDetails);
@@ -91,15 +92,9 @@ export function StatusUpdateModal({
         notes?: string;
       } = {};
 
-      if (status !== company?.status) {
-        patchData.status = status;
-      }
-      if (statusDateTime !== "" && statusDateTime !== company?.statusDateTime) {
-        patchData.statusDateTime = statusDateTime;
-      }
-      if (note !== company?.note) {
-        patchData.notes = note;
-      }
+      patchData.status = status;
+      patchData.notes = note;
+      patchData.statusDateTime = statusDateTime;
 
       // Only call the mutation if there are changes to be made
       if (patchData.status || patchData.statusDateTime || patchData.notes) {
@@ -143,9 +138,11 @@ export function StatusUpdateModal({
               {[
                 "Not Applied",
                 "Applied",
+                "Not Shortlisted",
                 "Shortlisted",
                 "Pre Placement Talk",
                 "OA",
+                "OA not clear",
                 "Aptitude round",
                 "GD",
                 "Technical round",

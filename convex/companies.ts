@@ -77,6 +77,7 @@ export const getAllCompanies = query({
                   .query("companies")
                   .withIndex("by_user_id")
                   .filter(q => q.eq(q.field("userId"), args.userId))
+                  .order("desc")
                   .collect();
       },
 }) 
