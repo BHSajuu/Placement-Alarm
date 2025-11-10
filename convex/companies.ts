@@ -162,19 +162,21 @@ export const incrementReminderCount = mutation({
 
 export const getPaginatedCompanies = query({
   args: {
-    userId: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const Identify = await ctx.auth.getUserIdentity();
-    if (!Identify || Identify.subject !== args.userId) {
+   const Identify = await ctx.auth.getUserIdentity();
+
+    if (!Identify) { 
       throw new Error("Unauthorized");
     }
+
+    const userId = Identify.subject;
 
     return await ctx.db
                     .query("companies")
                     .withIndex("by_user_id")
-                    .filter((q)=> q.eq(q.field("userId"), args.userId))
+                    .filter((q)=> q.eq(q.field("userId"), userId))
                     .order("desc")
                     .paginate(args.paginationOpts);
   },

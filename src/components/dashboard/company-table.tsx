@@ -48,7 +48,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
   } = usePaginatedQuery(
     api.companies.getPaginatedCompanies,
     {
-      userId: user?.id ?? "",
+     
     },
     {initialNumItems: 8} 
   );
@@ -139,7 +139,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
 
   //  Signed in, but either Clerk is still loading or Convex hasn't returned data
   if (!isLoaded || paginationStatus === "LoadingFirstPage") {
-    return <CompaniesTableSkeleton rows={5} />
+    return <CompaniesTableSkeleton rows={8} />
   }
 
 
