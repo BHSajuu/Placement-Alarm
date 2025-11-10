@@ -5,9 +5,10 @@ import { Building2, Clock, CheckCircle, XCircle } from "lucide-react"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useUser, useAuth } from "@clerk/nextjs"
+import { DashboardStatsSkeleton } from "./dashboard-stats-skeleton"
 
 export function DashboardStats() {
-  const { user } = useUser()
+  const { user, isLoaded } = useUser()
   const { isSignedIn } = useAuth()
   const companies = useQuery(
     api.companies.getAllCompanies, 
@@ -53,31 +54,11 @@ export function DashboardStats() {
     },
   ]
 
-  // Show loading skeleton only when user is signed in but data is still loading
-  if (isSignedIn && companies === undefined) {
-    return (
-      <div className="grid grid-cols-1 gap-6 lg:gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, index) => (
-          <Card
-            key={index}
-            className="w-full max-w-sm mx-auto h-48 bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700/50 animate-pulse"
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="p-3 rounded-xl bg-gray-700/50 w-12 h-12"></div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2 text-center">
-                <div className="h-4 bg-gray-700/50 rounded w-24 mx-auto"></div>
-                <div className="h-8 bg-gray-700/50 rounded w-16 mx-auto"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    )
-  }
+
+ if(!isLoaded){
+  return <DashboardStatsSkeleton/>
+ }
+ 
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:gap-0  sm:grid-cols-2 lg:grid-cols-4">

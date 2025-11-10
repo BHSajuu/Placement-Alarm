@@ -4,16 +4,18 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus, Sparkles, LogIn, User, BrainCircuit } from "lucide-react"
 import { AddCompanyModal } from "./add-company-modal"
-import { SignedIn, SignInButton } from "@clerk/nextjs"
+import { SignedIn, SignInButton, useUser } from "@clerk/nextjs"
 import { Unauthenticated } from "convex/react"
 import { useAuth } from "@clerk/nextjs"
 import toast from "react-hot-toast"
 import Link from "next/link"
+import { DashboardHeaderSkeleton } from "./dashboard-header-skeleton"
 
 export function DashboardHeader() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const { isSignedIn } = useAuth()
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isSignedIn } = useAuth();
+  const { isLoaded } = useUser();
+  
   const handleAddCompany = () => {
     if (!isSignedIn) {
       toast.custom((t) => (
@@ -27,6 +29,10 @@ export function DashboardHeader() {
 
     }
     setIsModalOpen(true)
+  }
+  
+  if(!isLoaded){
+    return <DashboardHeaderSkeleton/>
   }
 
   return (
