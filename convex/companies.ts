@@ -239,7 +239,7 @@ export const getPaginatedCompanies = query({
 
     // Apply driveType filter
     if (args.filters.driveType !== "all") {
-      const driveType = args.filters.driveType.toLowerCase().replace(/-/g, "");
+      const driveType = args.filters.driveType; 
       query = query.filter((q) => q.eq(q.field("driveType"), driveType));
     }
     

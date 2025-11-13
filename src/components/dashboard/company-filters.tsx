@@ -24,7 +24,6 @@ export function CompanyFilters({ filters, onFiltersChange }: CompanyFiltersProps
       search: "",
       status: "all",
       driveType: "all",
-      dateRange: "all",
     })
   }
 
@@ -50,16 +49,16 @@ export function CompanyFilters({ filters, onFiltersChange }: CompanyFiltersProps
           <SelectItem value="all" className="text-white hover:bg-gray-700">
             All Status
           </SelectItem>
-          <SelectItem value="applied" className="text-white hover:bg-gray-700">
+          <SelectItem value="Applied" className="text-white hover:bg-gray-700">
             Applied
           </SelectItem>
-          <SelectItem value="interview" className="text-white hover:bg-gray-700">
+          <SelectItem value="Interview" className="text-white hover:bg-gray-700">
             Interview
           </SelectItem>
-          <SelectItem value="offer" className="text-white hover:bg-gray-700">
+          <SelectItem value="Offer" className="text-white hover:bg-gray-700">
             Offer
           </SelectItem>
-          <SelectItem value="rejected" className="text-white hover:bg-gray-700">
+          <SelectItem value="Rejected" className="text-white hover:bg-gray-700">
             Rejected
           </SelectItem>
         </SelectContent>
@@ -72,10 +71,10 @@ export function CompanyFilters({ filters, onFiltersChange }: CompanyFiltersProps
           <SelectItem value="all" className="text-white hover:bg-gray-700">
             All Types
           </SelectItem>
-          <SelectItem value="oncampus" className="text-white hover:bg-gray-700">
+          <SelectItem value="On-Campus" className="text-white hover:bg-gray-700">
             On-Campus
           </SelectItem>
-          <SelectItem value="offcampus" className="text-white hover:bg-gray-700">
+          <SelectItem value="Off-Campus" className="text-white hover:bg-gray-700">
             Off-Campus
           </SelectItem>
         </SelectContent>
