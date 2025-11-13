@@ -19,7 +19,7 @@ import toast from "react-hot-toast"
 import { StatusUpdateModal } from "./status-update-modal"
 import {  useMutation, usePaginatedQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
-import {  useUser } from "@clerk/nextjs"
+import {  useAuth, useUser } from "@clerk/nextjs"
 import { Id } from "../../../convex/_generated/dataModel"
 import { CompaniesTableSkeleton } from "./loadingSkeleton"
 
@@ -39,38 +39,23 @@ export function CompanyTable({ filters }: CompanyTableProps) {
   const noteRef = useRef<HTMLDivElement>(null)
 
   const { user , isLoaded} = useUser()
- 
+  const { isSignedIn } = useAuth()
 
-  const {
-    results: companies,
+
+ const {
+    results: companies, 
     status: paginationStatus,
-    loadMore, 
+    loadMore,
   } = usePaginatedQuery(
-    api.companies.getPaginatedCompanies,
-    {
-     
-    },
-    {initialNumItems: 8} 
-  );
-
+    api.companies.getPaginatedCompanies, 
+    isSignedIn && user?.id 
+      ? { userId: user.id, filters: filters } 
+      : "skip",
+    { initialNumItems: 8 } 
+  ); 
 
   const deleteCompany = useMutation(api.companies.deleteCompany);
   
-  const filteredCompanies = companies?.filter((company) => {
-    const matchesSearch =
-      company.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-      company.role.toLowerCase().includes(filters.search.toLowerCase())
-    const matchesStatus =
-      filters.status === "all" ||
-      company.status?.toLowerCase() === filters.status
-    const matchesDriveType =
-      filters.driveType === "all" ||
-      company.driveType
-        .toLowerCase()
-        .replace("-", "") === filters.driveType.replace("-", "")
-
-    return matchesSearch && matchesStatus && matchesDriveType
-  })
 
   const handleDelete = async (companyId: Id<"companies">) => {
     try {
@@ -182,7 +167,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredCompanies?.map((company, index) => (
+            {companies?.map((company, index) => (
               <TableRow
                 key={company._id}
                 className="border-gray-700/50 hover:bg-gray-800/30 transition-all duration-300 hover:shadow-lg"
