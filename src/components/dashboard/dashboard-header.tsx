@@ -53,16 +53,7 @@ export function DashboardHeader() {
         </div>
 
         <div className="flex items-start gap-16">
-           <Link href="/analyzer">
-            <Button
-              variant="outline"
-              className="bg-gray-700/50 border-gray-600/50 text-white hover:bg-gray-600/70"
-            >
-              <BrainCircuit className="h-4 w-4 mr-2" />
-              AI Resume Analyzer
-            </Button>
-          </Link>
-
+      
           <Button
             onClick={handleAddCompany}
             className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-xl hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 px-6 py-3 text-base font-semibold"
@@ -83,7 +74,6 @@ export function DashboardHeader() {
             </SignInButton>
 
           </Unauthenticated>
-           {/* Profile Access Button - Creative floating design */}
           <SignedIn>
             <Link href="/profile">
               <div className="group relative">

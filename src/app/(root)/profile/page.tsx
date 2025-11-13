@@ -21,7 +21,6 @@ export default function Profile() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    whatsappNumber: "",
   })
 
   const profile = useQuery(
@@ -37,7 +36,6 @@ export default function Profile() {
       setFormData({
         name: profile.name || "",
         email: profile.email || "",
-        whatsappNumber: profile.whatsappNumber || "",
       })
     }
   }, [profile])
@@ -50,7 +48,6 @@ export default function Profile() {
         userId: user.id,
         name: formData.name,
         email: formData.email,
-        whatsappNumber: formData.whatsappNumber || undefined,
         profileImage: profile?.profileImage || user.imageUrl || undefined,
       })
       
@@ -67,7 +64,6 @@ export default function Profile() {
       setFormData({
         name: profile.name || "",
         email: profile.email || "",
-        whatsappNumber: profile.whatsappNumber || "",
       })
     }
     setIsEditing(false)
@@ -280,54 +276,6 @@ export default function Profile() {
                 />
               </div>
             </div>
-
-            {/* WhatsApp Number Field - Full Width */}
-            <div className="mt-8 space-y-3">
-              <Label htmlFor="whatsapp" className="text-gray-300 font-medium flex items-center gap-2 text-lg">
-                <div className="p-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-lg">
-                  <Phone className="h-4 w-4 text-pink-400" />
-                </div>
-                WhatsApp Number
-                <div className="ml-auto">
-                  <span className="text-xs text-blue-400 bg-blue-500/20 px-3 py-1 rounded-full border border-blue-500/30">
-                    For Deadline Reminders
-                  </span>
-                </div>
-              </Label>
-              <Input
-                id="whatsapp"
-                type="tel"
-                value={formData.whatsappNumber}
-                onChange={(e) => updateField("whatsappNumber", e.target.value)}
-                disabled={!isEditing}
-                className={`h-14 bg-gray-700/30 border-gray-600/50 text-white placeholder:text-gray-400 transition-all duration-300 rounded-xl text-lg ${
-                  isEditing ? "focus:border-purple-500 focus:bg-gray-700/50 focus:shadow-lg focus:shadow-purple-500/20" : "opacity-70"
-                  }`}
-                placeholder="+91 9876543210"
-              />
-              <p className="text-sm text-gray-400 mt-2 ml-2">
-                Include country code (e.g., +91 for India). This will be used for deadline reminder notifications.
-              </p>
-              
-              {isEditing && formData.whatsappNumber && (
-                <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300 text-sm">
-                  <p className="mb-3">
-                    <strong>Final step:</strong> Click the button below to activate reminders for your number in WhatsApp.
-                  </p>
-                  <Button asChild className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white border-0 shadow-lg">
-                    <a
-                      href="https://wa.me/14155238886?text=join%20girl-examine"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      Activate Reminders on WhatsApp
-                    </a>
-                  </Button>
-                </div>
-              )}
-            </div>
-
             {/* Info Card */}
             <ProfileInfoCard />
           </div>

@@ -9,9 +9,9 @@ A platform to help students track and manage their placement process effectively
 * **Dashboard:** Get a quick overview of your application stats, including total applications, active interviews, offers, and rejections.
 * **Company Directory:** A centralized place to manage all your job applications.
 * **Add and Track Applications:** Easily add new company applications with details like role, package, deadline, and application link.
-* **Smart Deadline Reminders:** Receive automated reminders for upcoming application deadlines via WhatsApp and Email.
+* **Smart Deadline Reminders:** Receive automated reminders for upcoming application deadlines via Email.
 * **User Authentication:** Secure user authentication powered by Clerk.
-* **Profile Management:** Manage your profile information, including your name, email, and WhatsApp number for notifications.
+* **Profile Management:** Manage your profile information, including your name, and email for notifications.
 
 ## 🚀 Technologies Used
 
@@ -19,7 +19,7 @@ A platform to help students track and manage their placement process effectively
 * **Database:** Convex
 * **Authentication:** Clerk
 * **Styling:** Tailwind CSS, shadcn/ui
-* **Notifications:** Twilio (for WhatsApp), Nodemailer (for Email)
+* **Notifications:**  Nodemailer (for Email)
 * **Deployment:** Vercel
 
 ## 📈 Future Improvements

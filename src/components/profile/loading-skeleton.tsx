@@ -63,16 +63,6 @@ function LoadingSkeleton() {
                 </div>
               </div>
 
-              {/* WhatsApp Field */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-gray-700/50 rounded-lg w-8 h-8"></div>
-                  <div className="h-5 bg-gray-700 rounded w-32"></div>
-                  <div className="ml-auto h-6 bg-gray-700/50 rounded-full w-36"></div>
-                </div>
-                <div className="h-14 bg-gray-700/30 rounded-xl"></div>
-                <div className="h-4 bg-gray-700/50 rounded w-80"></div>
-              </div>
 
               {/* Info Card Skeleton */}
               <div className="mt-8 p-6 bg-gray-700/20 rounded-xl border border-gray-700/50">

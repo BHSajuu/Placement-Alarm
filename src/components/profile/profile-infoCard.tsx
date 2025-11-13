@@ -14,17 +14,13 @@ function ProfileInfoCard() {
                                     <Sparkles className="h-4 w-4 text-yellow-400 animate-pulse" />
                               </h4>
                               <p className="text-gray-300 leading-relaxed">
-                                    Add your WhatsApp number to receive automated reminders about upcoming application deadlines.
+                                    Receive automated reminders about upcoming application deadlines.
                                     You'll get notifications 4 hours, 3 hours, and 2 hours before each deadline to ensure you never miss an opportunity.
                               </p>
                               <div className="mt-4 flex flex-wrap gap-2">
                                     <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm border border-purple-500/30">
                                           Email Notifications
                                     </span>
-                                    <span className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm border border-green-500/30">
-                                          WhatsApp Alerts
-                                    </span>
-
                               </div>
                         </div>
                   </div>

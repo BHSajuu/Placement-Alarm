@@ -35,16 +35,7 @@ export default defineSchema({
             userId: v.string(),
             name: v.string(),
             email: v.string(),
-            whatsappNumber: v.optional(v.string()),
             profileImage: v.optional(v.string()),
       }).index("by_user_id", ["userId"]),
 
-        analyses: defineTable({
-        userId: v.string(),
-        jobDescription: v.string(),
-        resumeText: v.string(),
-        analysis: v.any(), 
-        overallScore: v.number(),
-        resumeImageFile: v.optional(v.any())
-      }).index("by_user_id", ["userId"]),
 })
