@@ -283,14 +283,14 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
               type="button"
               variant="outline"
               onClick={onClose}
-              className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+              className="rounded-2xl bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0"
+              className="bg-blue-300 hover:bg-blue-400  rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-gray-500 transition-all duration-300 text-gray-700 hover:text-black border-0"
             >
               {isLoading ? (
                 <>

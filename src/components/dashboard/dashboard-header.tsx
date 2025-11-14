@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Plus, Sparkles, LogIn, User, BrainCircuit } from "lucide-react"
+import {  Sparkles, LogIn, User } from "lucide-react"
 import { AddCompanyModal } from "./add-company-modal"
 import { SignedIn, SignInButton, useUser } from "@clerk/nextjs"
 import { Unauthenticated } from "convex/react"
@@ -41,9 +41,9 @@ export function DashboardHeader() {
         animation: "fadeInUp 0.8s ease-out"
       }}>
         <div className="space-y-2 ">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 ">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-blue-200 to-purple-300 bg-clip-text text-transparent tracking-tight">
-              Dashboard
+              Placement-Alarm
             </h1>
             <Sparkles className="h-7 w-7 text-yellow-400" style={{
               animation: "pulse 2s ease-in-out infinite"
@@ -56,9 +56,8 @@ export function DashboardHeader() {
       
           <Button
             onClick={handleAddCompany}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-xl hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 px-6 py-3 text-base font-semibold"
+            className="bg-blue-300 hover:bg-blue-400 text-slate-950 hover:text-gray-900  rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-gray-500 transition-all duration-300 hover:scale-105 px-6 py-3 font-semibold"
           >
-            <Plus className="h-4 w-4 mr-2" />
             Add Company
           </Button>
           

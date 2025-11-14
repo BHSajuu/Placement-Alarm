@@ -15,7 +15,6 @@ export function DashboardHeaderSkeleton() {
 
       <div className="flex items-center gap-6">
         <div className="h-10 w-40 rounded-lg bg-gray-700/50"></div>
-        <div className="h-10 w-40 rounded-lg bg-gray-700/50"></div>
         <div className="h-10 w-10 rounded-full bg-gray-700/50"></div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CompanyTable } from "./company-table"
 import { CompanyFilters } from "./company-filters"
-import { Building2, Filter } from "lucide-react"
+import { Command, Filter } from "lucide-react"
 
 export function CompanyDirectory() {
   const [filters, setFilters] = useState({
@@ -19,8 +19,8 @@ export function CompanyDirectory() {
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
-              <Building2 className="h-5 w-5 text-white" />
+            <div className="p-3 bg-blue-300 hover:bg-blue-400  rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-gray-500 transition-all duration-300">
+              <Command className="h-5 w-5 text-slate-700 hover:animate-spin" />
             </div>
             <div>
               <CardTitle className="text-2xl text-white font-bold">Company Applications</CardTitle>

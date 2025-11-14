@@ -38,14 +38,14 @@ export function CompanyFilters({ filters, onFiltersChange }: CompanyFiltersProps
           placeholder="Search companies or roles..."
           value={filters.search}
           onChange={(e) => updateFilter("search", e.target.value)}
-          className="bg-gray-700/50 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-500 focus:bg-gray-700/70 transition-all duration-300 backdrop-blur-sm shadow-lg"
+          className="rounded-full bg-gray-700/50 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-500 focus:bg-gray-700/70 transition-all duration-300 backdrop-blur-sm shadow-lg"
         />
       </div>
       <Select value={filters.status} onValueChange={(value) => updateFilter("status", value)}>
-        <SelectTrigger className="w-full sm:w-[180px] bg-gray-700/50 border-gray-600/50 text-white backdrop-blur-sm shadow-lg">
+        <SelectTrigger className="w-full rounded-full sm:w-[180px] bg-gray-700/50 border-gray-600/50 text-white backdrop-blur-sm shadow-lg">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
-        <SelectContent className="bg-gray-800/90 border-gray-700/50 backdrop-blur-sm">
+        <SelectContent className="bg-gray-800/90  border-gray-700/50 backdrop-blur-sm">
           <SelectItem value="all" className="text-white hover:bg-gray-700">
             All Status
           </SelectItem>
@@ -64,7 +64,7 @@ export function CompanyFilters({ filters, onFiltersChange }: CompanyFiltersProps
         </SelectContent>
       </Select>
       <Select value={filters.driveType} onValueChange={(value) => updateFilter("driveType", value)}>
-        <SelectTrigger className="w-full sm:w-[180px] bg-gray-700/50 border-gray-600/50 text-white backdrop-blur-sm shadow-lg">
+        <SelectTrigger className="w-full rounded-full sm:w-[180px] bg-gray-700/50 border-gray-600/50 text-white backdrop-blur-sm shadow-lg">
           <SelectValue placeholder="Drive Type" />
         </SelectTrigger>
         <SelectContent className="bg-gray-800/90 border-gray-700/50 backdrop-blur-sm">
