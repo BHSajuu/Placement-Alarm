@@ -123,7 +123,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
   }
 
   //  Signed in, but either Clerk is still loading or Convex hasn't returned data
-  if (!isLoaded || paginationStatus === "LoadingFirstPage") {
+  if (!isLoaded || (user && paginationStatus === "LoadingFirstPage")) {
     return <CompaniesTableSkeleton rows={8} />
   }
 

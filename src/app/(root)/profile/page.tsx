@@ -223,7 +223,9 @@ export default function Profile() {
                 </div>
               )}
                <SignedIn>
-                 <Button className="bg-red-400 hover:bg-red-600 text-white border-0 shadow-xl hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 transform hover:scale-105 rounded-full px-6 py-3">
+                 <Button 
+                 asChild
+                 className="bg-red-400 hover:bg-red-600 text-white border-0 shadow-xl hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 transform hover:scale-105 rounded-full px-6 py-3">
                   <SignOutButton />
                  </Button>
                </SignedIn>

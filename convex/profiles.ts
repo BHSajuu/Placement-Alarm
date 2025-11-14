@@ -56,7 +56,6 @@ export const getUserProfile = query({
 });
 
 
-
 export const getProfileForReminder = query({
   args: {
     userId: v.string(),
