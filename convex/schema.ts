@@ -39,4 +39,14 @@ export default defineSchema({
             profileImageStorageId: v.optional(v.id("_storage")),
       }).index("by_user_id", ["userId"]),
 
+
+  documents: defineTable({
+        userId: v.string(),
+        documentName: v.string(),
+        storageId: v.id("_storage"),
+        fileType: v.string(),
+        fileSize: v.number(), 
+        companyId: v.optional(v.id("companies")), 
+      }).index("by_user_id", ["userId"])
+        .index("by_companyId", ["companyId"]), 
 })

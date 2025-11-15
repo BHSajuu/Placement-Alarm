@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import {  Sparkles, LogIn, User } from "lucide-react"
+import { Sparkles, LogIn, User, FileText } from "lucide-react"
 import { AddCompanyModal } from "./add-company-modal"
 import { SignedIn, SignInButton, useUser } from "@clerk/nextjs"
 import { Unauthenticated } from "convex/react"
@@ -15,7 +15,7 @@ export function DashboardHeader() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isSignedIn } = useAuth();
   const { isLoaded } = useUser();
-  
+
   const handleAddCompany = () => {
     if (!isSignedIn) {
       toast.custom((t) => (
@@ -30,9 +30,9 @@ export function DashboardHeader() {
     }
     setIsModalOpen(true)
   }
-  
-  if(!isLoaded){
-    return <DashboardHeaderSkeleton/>
+
+  if (!isLoaded) {
+    return <DashboardHeaderSkeleton />
   }
 
   return (
@@ -53,14 +53,14 @@ export function DashboardHeader() {
         </div>
 
         <div className="flex items-start gap-16">
-      
+
           <Button
             onClick={handleAddCompany}
             className="bg-blue-300 hover:bg-blue-400 text-slate-950 hover:text-gray-900  rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-gray-500 transition-all duration-300 hover:scale-105 px-6 py-3 font-semibold"
           >
             Add Company
           </Button>
-          
+
           <Unauthenticated>
             <SignInButton mode="modal">
               <div
@@ -74,6 +74,15 @@ export function DashboardHeader() {
 
           </Unauthenticated>
           <SignedIn>
+            <Button
+              asChild
+              className="bg-gray-700/50 border border-gray-600/50 text-white hover:bg-gray-600/70 transition-all duration-300 transform hover:scale-105 rounded-full px-6 py-3"
+            >
+              <Link href="/documents">
+                <FileText className="h-4 w-4 mr-2" />
+                Manage Documents
+              </Link>
+            </Button>
             <Link href="/profile">
               <div className="group relative">
                 <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300 group-hover:duration-200 animate-pulse"></div>

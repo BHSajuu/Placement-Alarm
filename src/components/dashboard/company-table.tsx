@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, Trash2, FileText, Loader2 } from "lucide-react"
+import { Edit, Trash2, FileText, Loader2, Files } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { Building2 } from "lucide-react"
 import toast from "react-hot-toast"
@@ -22,6 +22,7 @@ import { api } from "../../../convex/_generated/api"
 import {  useAuth, useUser } from "@clerk/nextjs"
 import { Id } from "../../../convex/_generated/dataModel"
 import { CompaniesTableSkeleton } from "./loadingSkeleton"
+import { CompanyDocumentModal } from "../documents/company-document-modal"
 
 
 interface CompanyTableProps {
@@ -32,8 +33,14 @@ interface CompanyTableProps {
   }
 }
 
+type SelectedCompanyDocs = {
+  id: Id<"companies">;
+  name: string;
+} | null;
+
 export function CompanyTable({ filters }: CompanyTableProps) {
   const [selectedCompany, setSelectedCompany] = useState<Id<"companies"> | null>(null)
+  const [docModalCompany, setDocModalCompany] = useState<SelectedCompanyDocs>(null);
   const [showFullNote, setShowFullNote] = useState<string | null>(null)
   const [noteCoords, setNoteCoords] = useState({ x: 0, y: 0 })
   const noteRef = useRef<HTMLDivElement>(null)
@@ -245,6 +252,16 @@ export function CompanyTable({ filters }: CompanyTableProps) {
                       variant="ghost"
                       size="sm"
                       onClick={() =>
+                        setDocModalCompany({ id: company._id, name: company.name })
+                      }
+                      className="text-green-400 hover:text-green-300 hover:bg-green-500/20 transition-all duration-300 hover:scale-110"
+                    >
+                      <Files className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
                         setSelectedCompany(company._id)
                       }
                       className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 transition-all duration-300 hover:scale-110"
@@ -335,6 +352,14 @@ export function CompanyTable({ filters }: CompanyTableProps) {
           note: c.notes ?? ""
         }))}
       />
+      {docModalCompany && (
+        <CompanyDocumentModal
+          isOpen={!!docModalCompany}
+          onClose={() => setDocModalCompany(null)}
+          companyId={docModalCompany.id}
+          companyName={docModalCompany.name}
+        />
+      )}
     </>
   )}
   else{
