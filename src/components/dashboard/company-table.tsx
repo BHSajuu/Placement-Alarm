@@ -160,9 +160,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
               <TableHead className="text-gray-200 font-semibold">Status</TableHead>
               <TableHead className="text-gray-200 font-semibold">Drive Type</TableHead>
               <TableHead className="text-gray-200 font-semibold">Notes</TableHead>
-              <TableHead className="text-gray-200 font-semibold">
-                Registration Link
-              </TableHead>
+              <TableHead className="text-gray-200 font-semibold">Link</TableHead>
               <TableHead className="text-gray-200 font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -280,11 +278,17 @@ export function CompanyTable({ filters }: CompanyTableProps) {
           </Button>
         )}
         {paginationStatus === "LoadingMore" && (
-           <>
-            <Loader2 className="w-12 h-12 text-gray-600 mx-auto mb-4 animate-spin" />
-            <div className="text-gray-400">Loading...</div>
-           </>
-        )}
+
+          <div className="flex items-center justify-center py-10">
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 rounded-full border-4 border-gray-300"></div>
+
+              <div className="absolute inset-0 animate-spin [animation-duration:1.4s]">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-r from-green-500 via-indigo-200 to-slate-800 absolute -top-2 left-1/2 -translate-x-1/2 shadow-[0_0_15px_rgba(236,72,153,0.7)]"></div>
+              </div>
+            </div>
+          </div>
+      )}
       </div>
 
       {/* Full note popup with portal */}
