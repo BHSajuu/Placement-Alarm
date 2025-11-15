@@ -6,7 +6,7 @@ import { useMutation, useQuery } from "convex/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { User, Phone, Mail, Edit3, Save, X,  ArrowLeft, Shield, Bell, Camera, Send, Loader } from "lucide-react"
+import { User, Mail, Edit3, Save, X,  ArrowLeft, Shield, Bell, Camera, Loader } from "lucide-react"
 import toast from "react-hot-toast"
 import Image from "next/image"
 import Link from "next/link"
@@ -23,13 +23,14 @@ export default function Profile() {
     email: "",
   })
 
-  const profile = useQuery(
+const profile = useQuery(
     api.profiles.getUserProfile,
     user?.id ? { userId: user.id } : "skip"
   )
 
   const upsertProfile = useMutation(api.profiles.upsertProfile)
   const updateProfileImage = useMutation(api.profiles.updateProfileImage)
+  const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
 
   useEffect(() => {
     if (profile) {
@@ -48,7 +49,6 @@ export default function Profile() {
         userId: user.id,
         name: formData.name,
         email: formData.email,
-        profileImage: profile?.profileImage || user.imageUrl || undefined,
       })
       
       toast.success("Profile updated successfully!")
@@ -69,36 +69,40 @@ export default function Profile() {
     setIsEditing(false)
   }
  
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    setIsUploading(true);
+    const toastId = toast.loading("Uploading image...");
+
     try {
-      const file = event.target.files?.[0];
-      if (!file) return;
+      // 1. Get the upload URL from Convex
+      const postUrl = await generateUploadUrl();
 
-      setIsUploading(true);
+      // 2. Upload the file to that URL using 'fetch'
+      const result = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
 
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const base64String = e.target?.result as string;
-          if (base64String && user?.id) {
-            await updateProfileImage({ 
-              userId: user.id, 
-              profileImage: base64String 
-            });
-            toast.success("Profile image updated successfully!");
-          }
-        } catch (error) {
-          console.error("Image upload error:", error);
-          toast.error("Failed to update profile image");
-        } finally {
-          setIsUploading(false);
-        }
-      };
-      reader.readAsDataURL(file);
+      // 3. Get the storageId from the response
+      const { storageId } = await result.json();
+
+      // 4. Save the new storageId to the user's profile
+      await updateProfileImage({ 
+        userId: user.id, 
+        storageId: storageId 
+      });
+
+      toast.success("Profile image updated successfully!", { id: toastId });
     } catch (error) {
       console.error("Image upload error:", error);
-      toast.error("Failed to update profile image");
+      toast.error("Failed to update profile image", { id: toastId });
+    } finally {
       setIsUploading(false);
+      event.target.value = ""; 
     }
   }
 
@@ -150,7 +154,7 @@ export default function Profile() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
                 <div className="relative">
                   <Image
-                    src={profile?.profileImage  || "/default-avatar.png"}
+                    src={profile?.imageUrl  || "/default-avatar.png"}
                     alt="Profile"
                     width={120}
                     height={120}

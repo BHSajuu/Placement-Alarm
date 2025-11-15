@@ -35,7 +35,8 @@ export default defineSchema({
             userId: v.string(),
             name: v.string(),
             email: v.string(),
-            profileImage: v.optional(v.string()),
+            clerkImageUrl: v.optional(v.string()), // For the original Clerk image
+            profileImageStorageId: v.optional(v.id("_storage")),
       }).index("by_user_id", ["userId"]),
 
 })

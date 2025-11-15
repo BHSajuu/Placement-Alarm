@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
       'img.clerk.com',
       'images.clerk.dev'
     ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "descriptive-elephant-467.convex.cloud",
+        port: "",
+        pathname: "/api/storage/**",
+      },
+    ],
   },
 };
 

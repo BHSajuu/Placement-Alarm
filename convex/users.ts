@@ -33,7 +33,8 @@ export const syncUser = mutation({
         userId: args.userId,
         email: args.email,
         name: args.name,
-        profileImage: args.profileImage,
+        clerkImageUrl: args.profileImage, 
+        profileImageStorageId: undefined, 
       });
     }
   },
