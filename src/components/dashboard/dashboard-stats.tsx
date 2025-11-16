@@ -61,7 +61,7 @@ export function DashboardStats() {
  
 
   return (
-    <div className="grid grid-cols-2 gap-2 lg:gap-0   lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-x-8 gap-y-3 lg:gap-0   lg:grid-cols-4">
       {stats.map((stat, index) => (
         <Card
           key={stat.name}

@@ -35,7 +35,7 @@ function LoadingSkeleton() {
                   </div>
 
                   {/* Action Buttons Skeleton */}
-                  <div className="flex flex-col items-center gap-6 mt-6 md:mt-0">
+                  <div className="flex  md:flex-col items-center gap-6 mt-6 md:mt-0">
                     <div className="h-12 bg-gray-700 rounded-full w-32"></div>
                     <div className="h-12 bg-gray-700 rounded-full w-24"></div>
                   </div>
@@ -64,17 +64,41 @@ function LoadingSkeleton() {
               </div>
 
 
-              {/* Info Card Skeleton */}
-              <div className="mt-8 p-6 bg-gray-700/20 rounded-xl border border-gray-700/50">
-                <div className="space-y-4">
-                  <div className="h-6 bg-gray-700 rounded w-48"></div>
-                  <div className="space-y-2">
+              {/* --- UPDATED Info Card Skeleton --- */}
+              <div className="mt-8 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 border border-blue-500/20 rounded-2xl p-6">
+                <div className="flex flex-col items-start space-x-4">
+                  {/* Icon + Title */}
+                  <div className="flex items-start space-x-4 w-full">
+                    <div className="p-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl w-12 h-12"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-6 bg-gray-700 rounded w-48"></div>
+                      
+                      {/* Desktop Skeleton Text (hidden on mobile) */}
+                      <div className="hidden md:block space-y-2">
+                        <div className="h-4 bg-gray-700/70 rounded w-full"></div>
+                        <div className="h-4 bg-gray-700/70 rounded w-3/4"></div>
+                      </div>
+                      {/* Desktop Skeleton Tags (hidden on mobile) */}
+                      <div className="hidden md:flex mt-4 gap-2">
+                          <div className="h-6 bg-purple-500/20 rounded-full w-32"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Mobile Skeleton Text (hidden on desktop) */}
+                  <div className="md:hidden w-full space-y-2 mt-4">
                     <div className="h-4 bg-gray-700/70 rounded w-full"></div>
                     <div className="h-4 bg-gray-700/70 rounded w-3/4"></div>
                     <div className="h-4 bg-gray-700/70 rounded w-5/6"></div>
+                    
+                    {/* Mobile Skeleton Tags */}
+                    <div className="flex mt-4 gap-2">
+                      <div className="h-6 bg-purple-500/20 rounded-full w-32"></div>
+                    </div>
                   </div>
                 </div>
               </div>
+              {/* --- END UPDATED Info Card Skeleton --- */}
             </div>
           </div>
         </div>

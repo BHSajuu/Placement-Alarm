@@ -80,7 +80,7 @@ export function CompanyDocumentModal({ isOpen, onClose, companyId, companyName }
             {documents && documents.map((document) => (
               <div 
                 key={document._id} 
-                className="bg-gray-700/50  rounded-2xl border border-gray-700/50 px-4 py-3 flex items-center justify-between hover:shadow-md hover:shadow-blue-200  transition-all duration-300"
+                className="w-80 md:w-auto bg-gray-700/50  rounded-2xl border border-gray-700/50 px-4 py-3 flex items-center justify-between hover:shadow-md hover:shadow-blue-200  transition-all duration-300"
               >
                 <div className="flex items-center gap-4 overflow-hidden">
                   <FileText className="h-5 w-5 text-blue-400 flex-shrink-0" />

@@ -1,14 +1,28 @@
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 
 export function CompaniesTableSkeleton({ rows = 5 }: { rows?: number }) {
+  const headers = [
+    { label: "Company", width: "w-48" },
+    { label: "Role", width: "w-26" },
+    { label: "Type", width: "w-24" },
+    { label: "Package", width: "w-20" },
+    { label: "Deadline", width: "w-28" },
+    { label: "Status", width: "w-30" },
+    { label: "Drive Type", width: "w-26" },
+    { label: "Notes", width: "w-20" },
+    { label: "Link", width: "w-16" },
+    { label: "Actions", width: "w-28" },
+  ];
+
   return (
     <div className="rounded-xl border border-gray-700/50 overflow-hidden shadow-2xl backdrop-blur-sm animate-pulse">
       <Table>
         {/* Header (static, but pulsing) */}
         <TableHeader className="bg-gradient-to-r from-gray-900/80 to-gray-800/80">
           <TableRow className="border-gray-700/50">
-            {["Company","Role","Type","Package","Deadline","Status","Drive Type","Notes","Link","Actions"].map((label) => (
-              <TableHead key={label}>
+            {/* Applied fixed widths to match the real table component */}
+            {headers.map((header) => (
+              <TableHead key={header.label} className={`${header.width} text-gray-200 font-semibold`}>
                 <div className="h-4 w-20 bg-gray-700 rounded-md" />
               </TableHead>
             ))}
@@ -22,7 +36,7 @@ export function CompaniesTableSkeleton({ rows = 5 }: { rows?: number }) {
               key={idx}
               className="border-gray-700/50"
             >
-              {Array(10).fill(0).map((_, cell) => (
+              {headers.map((_, cell) => (
                 <TableCell key={cell}>
                   <div className="h-4 bg-gray-700 rounded-md w-full" />
                 </TableCell>
