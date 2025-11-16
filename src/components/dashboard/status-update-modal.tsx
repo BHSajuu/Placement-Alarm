@@ -90,15 +90,13 @@ export function StatusUpdateModal({
       const patchData: { 
         status?: string;
         statusDateTime?: string;
-        notes?: string;
       } = {};
 
       patchData.status = status;
-      patchData.notes = note;
       patchData.statusDateTime = statusDateTime;
 
       // Only call the mutation if there are changes to be made
-      if (patchData.status || patchData.statusDateTime || patchData.notes) {
+      if (patchData.status || patchData.statusDateTime ) {
         await updateCompanyDetails({
           companyId,
           ...patchData,
@@ -121,7 +119,7 @@ export function StatusUpdateModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="  bg-gray-950 border-gray-700 text-white shadow-2xl shadow-blue-300/30">
         <DialogHeader>
-          <DialogTitle className="text-white md:text-sm">
+          <DialogTitle className="text-white md:text-xl">
             Update Application Details for <span className="text-blue-300">{company?.name}.</span>
           </DialogTitle>
         </DialogHeader>

@@ -96,6 +96,9 @@ export const updateCompanyDetails = mutation({
             if (!Identify) {
                   throw new Error("Unauthorized");
             }
+            
+            const userId = Identify.subject;
+
             const user = ctx.db
                   .query("users")
                   .withIndex("by_user_id")
@@ -104,12 +107,25 @@ export const updateCompanyDetails = mutation({
             if (!user) {
                   throw new Error("User not found");
             }
-            return await ctx.db
+
+            // Patch the main company record with the latest status
+            await ctx.db
                   .patch(args.companyId, {
                         status: args.status,
                         statusDateTime: args.statusDateTime,
-                        notes: args.notes,
                   });
+            
+            // If status and date are provided, create a historical status event
+            if(args.status && args.statusDateTime){
+                  await ctx.db.insert("statusEvents",{
+                        companyId: args.companyId,
+                        userId: userId,
+                        status: args.status,
+                        eventDate: args.statusDateTime,
+                        notes: args.notes,
+                  })
+            }
+            return {success: true};
       },
 })
 

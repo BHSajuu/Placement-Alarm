@@ -17,6 +17,7 @@ import type * as companies from "../companies.js";
 import type * as documents from "../documents.js";
 import type * as http from "../http.js";
 import type * as profiles from "../profiles.js";
+import type * as statusEvents from "../statusEvents.js";
 import type * as users from "../users.js";
 
 /**
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   documents: typeof documents;
   http: typeof http;
   profiles: typeof profiles;
+  statusEvents: typeof statusEvents;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

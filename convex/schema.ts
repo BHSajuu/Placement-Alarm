@@ -18,7 +18,6 @@ export default defineSchema({
             link: v.optional(v.string()),
             status: v.optional(v.string()),
             statusDateTime: v.optional(v.string()),
-            notes: v.optional(v.string()), 
             userId: v.string(),
             remindersSent: v.optional(v.number()),
             lastReminderAt: v.optional(v.string()),
@@ -40,13 +39,21 @@ export default defineSchema({
       }).index("by_user_id", ["userId"]),
 
 
-  documents: defineTable({
-        userId: v.string(),
-        documentName: v.string(),
-        storageId: v.id("_storage"),
-        fileType: v.string(),
-        fileSize: v.number(), 
-        companyId: v.optional(v.id("companies")), 
-      }).index("by_user_id", ["userId"])
-        .index("by_companyId", ["companyId"]), 
-})
+      documents: defineTable({
+            userId: v.string(),
+            documentName: v.string(),
+            storageId: v.id("_storage"),
+            fileType: v.string(),
+            fileSize: v.number(), 
+            companyId: v.optional(v.id("companies")), 
+            }).index("by_user_id", ["userId"])
+            .index("by_companyId", ["companyId"]), 
+
+      statusEvents: defineTable({
+            companyId: v.id("companies"),
+            userId: v.string(),
+            status: v.string(),
+            eventDate: v.string(),
+            notes: v.optional(v.string()),
+            }).index("by_companyId_userId", ["companyId", "userId"]),
+});

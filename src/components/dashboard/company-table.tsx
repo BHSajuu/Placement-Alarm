@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
-import { createPortal } from "react-dom"
+import { useState} from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, Trash2, FileText,  Dock } from "lucide-react"
+import { Edit, Trash2, Dock, ListOrdered } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { Building2 } from "lucide-react"
 import toast from "react-hot-toast"
@@ -23,6 +22,7 @@ import {  useAuth, useUser } from "@clerk/nextjs"
 import { Id } from "../../../convex/_generated/dataModel"
 import { CompaniesTableSkeleton } from "./loadingSkeleton"
 import { CompanyDocumentModal } from "../documents/company-document-modal"
+import { TimelineModal } from "./timeline-modal"
 
 
 interface CompanyTableProps {
@@ -38,13 +38,15 @@ type SelectedCompanyDocs = {
   name: string;
 } | null;
 
+type SelectedCompanyTimeline = {
+  id: Id<"companies">;
+  name: string;
+} | null;
+
 export function CompanyTable({ filters }: CompanyTableProps) {
   const [selectedCompany, setSelectedCompany] = useState<Id<"companies"> | null>(null)
   const [docModalCompany, setDocModalCompany] = useState<SelectedCompanyDocs>(null);
-  const [showFullNote, setShowFullNote] = useState<string | null>(null)
-  const [noteCoords, setNoteCoords] = useState({ x: 0, y: 0 })
-  const noteRef = useRef<HTMLDivElement>(null)
-
+  const [timelineModalCompany, setTimelineModalCompany] = useState<SelectedCompanyTimeline>(null);
   const { user , isLoaded} = useUser()
   const { isSignedIn } = useAuth()
 
@@ -73,28 +75,6 @@ export function CompanyTable({ filters }: CompanyTableProps) {
     }
   }
 
-  const handleNoteClick = (note: string, event: React.MouseEvent) => {
-    if (!note || note.trim() === "") return
-    
-    const rect = event.currentTarget.getBoundingClientRect()
-    setNoteCoords({
-      x: rect.left,
-      y: rect.top
-    })
-    setShowFullNote(note)
-  }
-
-  const handleClickOutside = (event: React.MouseEvent) => {
-    if (noteRef.current && !noteRef.current.contains(event.target as Node)) {
-      setShowFullNote(null)
-    }
-  }
-
-  const truncateNote = (note: string | undefined, maxLength: number = 10) => {
-    if (!note || note.trim() === "") return "No notes"
-    if (note.length <= maxLength) return note
-    return note.substring(0, maxLength) + "..."
-  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -160,14 +140,13 @@ export function CompanyTable({ filters }: CompanyTableProps) {
              <TableRow className="border-gray-700/50 hover:bg-gray-800/30">
               <TableHead className="w-48 text-gray-200 font-semibold ">Company</TableHead>
               <TableHead className="w-26 text-gray-200 font-semibold ">Role</TableHead>
-              <TableHead className="w-24 text-gray-200 font-semibold ">Type</TableHead>
-              <TableHead className="w-20 text-gray-200 font-semibold ">Package</TableHead>
-              <TableHead className="w-28 text-gray-200 font-semibold ">Deadline</TableHead>
-              <TableHead className="w-30 text-gray-200 font-semibold ">Status</TableHead>
-              <TableHead className="w-26 text-gray-200 font-semibold ">Drive Type</TableHead>
-              <TableHead className="w-20 text-gray-200 font-semibold ">Notes</TableHead>
-              <TableHead className="w-16 text-gray-200 font-semibold ">Link</TableHead>
-              <TableHead className="w-28 text-gray-200 font-semibold ">Actions</TableHead>
+              <TableHead className="w-21 text-gray-200 font-semibold ">Type</TableHead>
+              <TableHead className="w-22 text-gray-200 font-semibold ">Package</TableHead>
+              <TableHead className="w-31 pl-10 text-gray-200 font-semibold ">Deadline</TableHead>
+              <TableHead className="w-24 text-gray-200 font-semibold ">Status</TableHead>
+              <TableHead className="w-20 text-gray-200 font-semibold ">Drive Type</TableHead>
+              <TableHead className="w-10 text-gray-200 font-semibold ">Link</TableHead>
+              <TableHead className="w-27 pl-10 text-gray-200 font-semibold ">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -203,37 +182,10 @@ export function CompanyTable({ filters }: CompanyTableProps) {
                     >
                       {company.status}
                     </Badge>
-                    {company.statusDateTime && (
-                      <div className="text-xs text-gray-400 font-medium whitespace-normal break-words max-w-[10rem]">
-                        {new Date(company.statusDateTime).toLocaleString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true
-                        })}
-                      </div>
-                    )}
                   </div>
                 </TableCell>
                 <TableCell className="text-gray-200 font-medium whitespace-normal break-words max-w-[8rem]">
                   {company.driveType}
-                </TableCell>
-                <TableCell>
-                  <div
-                    className={`text-gray-300 font-medium cursor-pointer hover:text-blue-400 transition-colors duration-200 flex items-center gap-1 whitespace-normal break-words max-w-[12rem]${
-                      company.notes && company.notes.trim() !== "" ? "hover:underline" : ""
-                    }`}
-                    onClick={(e) => handleNoteClick(company.notes || "", e)}
-                  >
-                    {company.notes && company.notes.trim() !== "" && (
-                      <FileText className="h-3 w-3" />
-                    )}
-                    <span className="text-sm">
-                      {truncateNote(company.notes)}
-                    </span>
-                  </div>
                 </TableCell>
                 <TableCell>
                   <a
@@ -241,12 +193,22 @@ export function CompanyTable({ filters }: CompanyTableProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 underline font-medium transition-colors duration-200"
-                  >
-                    Register
+                 >
+                    {company.link ? <span>open</span> : <span> close </span>}
                   </a>
                 </TableCell>
                 <TableCell>
-                  <div className="flex space-x-1">
+                  <div className="flex">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setTimelineModalCompany({ id: company._id, name: company.name })
+                      }
+                      className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-all duration-300 hover:scale-110"
+                    >
+                      <ListOrdered className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -307,38 +269,6 @@ export function CompanyTable({ filters }: CompanyTableProps) {
       )}
       </div>
 
-      {/* Full note popup with portal */}
-      {showFullNote &&
-        createPortal(
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            onClick={handleClickOutside}
-          >
-            <div
-              ref={noteRef}
-              className="bg-gray-900 text-white p-4 rounded-xl border border-gray-700/50 max-w-md shadow-2xl backdrop-blur-sm"
-              style={{
-                position: "fixed",
-                top: noteCoords.y + 30,
-                left: Math.min(noteCoords.x, window.innerWidth - 400),
-                animation: "fadeIn 0.3s ease-out"
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="h-4 w-4 text-blue-400" />
-                <span className="text-sm font-semibold text-blue-400">Note</span>
-              </div>
-              <p className="text-sm leading-relaxed text-gray-200">
-                {showFullNote}
-              </p>
-              <div className="mt-3 text-xs text-gray-400">
-                Click outside to close
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
       <StatusUpdateModal
         companyId={selectedCompany}
         isOpen={!!selectedCompany}
@@ -348,7 +278,6 @@ export function CompanyTable({ filters }: CompanyTableProps) {
           name: c.name,
           status: c.status ?? "",
           statusDateTime: c.statusDateTime,
-          note: c.notes ?? ""
         }))}
       />
       {docModalCompany && (
@@ -357,6 +286,14 @@ export function CompanyTable({ filters }: CompanyTableProps) {
           onClose={() => setDocModalCompany(null)}
           companyId={docModalCompany.id}
           companyName={docModalCompany.name}
+        />
+      )}
+      {timelineModalCompany && (
+        <TimelineModal
+          isOpen={!!timelineModalCompany}
+          onClose={() => setTimelineModalCompany(null)}
+          companyId={timelineModalCompany.id}
+          companyName={timelineModalCompany.name}
         />
       )}
     </>

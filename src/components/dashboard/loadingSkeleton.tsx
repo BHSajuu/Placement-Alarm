@@ -9,7 +9,6 @@ export function CompaniesTableSkeleton({ rows = 5 }: { rows?: number }) {
     { label: "Deadline", width: "w-28" },
     { label: "Status", width: "w-30" },
     { label: "Drive Type", width: "w-26" },
-    { label: "Notes", width: "w-20" },
     { label: "Link", width: "w-16" },
     { label: "Actions", width: "w-28" },
   ];
