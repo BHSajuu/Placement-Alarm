@@ -70,7 +70,7 @@ export function StatusUpdateModal({
     if (company) {
       setStatus(company.status);
       setStatusDateTime("");
-      setNote(company.note ?? "");
+      setNote("");
       setStatusDate("");
       setTimeHour("");
       setTimeMinute("");
@@ -87,28 +87,19 @@ export function StatusUpdateModal({
 
     setIsLoading(true);
     try {
-      const patchData: { 
-        status?: string;
-        statusDateTime?: string;
-      } = {};
-
-      patchData.status = status;
-      patchData.statusDateTime = statusDateTime;
-
-      // Only call the mutation if there are changes to be made
-      if (patchData.status || patchData.statusDateTime ) {
-        await updateCompanyDetails({
-          companyId,
-          ...patchData,
-        });
-        toast.success("Status updated successfully");
-        onClose();
-      } else {
-        toast.error("No changes detected");
-        onClose();
-      }
+  
+      await updateCompanyDetails({
+        companyId,
+        status: status,
+        statusDateTime: statusDateTime, 
+        notes: note,                    
+      });
+      
+      toast.success("Status updated successfully");
+      onClose();
 
     } catch (error) {
+      console.error("Failed to update status:", error);
       toast.error("Failed to update status");
     } finally {
       setIsLoading(false);

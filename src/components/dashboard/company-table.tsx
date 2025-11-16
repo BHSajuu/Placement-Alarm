@@ -1,6 +1,6 @@
 "use client"
 
-import { useState} from "react"
+import { useMemo, useState} from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, Trash2, Dock, ListOrdered } from "lucide-react"
+import { Edit, Trash2, Dock, ListOrdered, Link, Link2, CircleOff } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { Building2 } from "lucide-react"
 import toast from "react-hot-toast"
@@ -62,6 +62,15 @@ export function CompanyTable({ filters }: CompanyTableProps) {
       : "skip",
     { initialNumItems: 8 } 
   ); 
+  
+  const modalCompanies = useMemo(() => {
+  return (companies ?? []).map((c: any) => ({
+    _id: c._id,
+    name: c.name,
+    status: c.status ?? "",
+    statusDateTime: c.statusDateTime,
+  }));
+}, [companies]);
 
   const deleteCompany = useMutation(api.companies.deleteCompany);
   
@@ -138,14 +147,14 @@ export function CompanyTable({ filters }: CompanyTableProps) {
         <Table className="table-fixed w-full">
           <TableHeader className=" bg-gray-950  backdrop-blur-lg shadow-lg">
              <TableRow className="border-gray-700/50 hover:bg-gray-800/30">
-              <TableHead className="w-48 text-gray-200 font-semibold ">Company</TableHead>
+              <TableHead className="w-48 pl-10 text-gray-200 font-semibold ">Company</TableHead>
               <TableHead className="w-26 text-gray-200 font-semibold ">Role</TableHead>
               <TableHead className="w-21 text-gray-200 font-semibold ">Type</TableHead>
               <TableHead className="w-22 text-gray-200 font-semibold ">Package</TableHead>
               <TableHead className="w-31 pl-10 text-gray-200 font-semibold ">Deadline</TableHead>
               <TableHead className="w-24 text-gray-200 font-semibold ">Status</TableHead>
               <TableHead className="w-20 text-gray-200 font-semibold ">Drive Type</TableHead>
-              <TableHead className="w-10 text-gray-200 font-semibold ">Link</TableHead>
+              <TableHead className="w-8 text-gray-200 font-semibold ">Link</TableHead>
               <TableHead className="w-27 pl-10 text-gray-200 font-semibold ">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -159,7 +168,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
                   animation: `fadeInUp 0.6s ease-out ${index * 0.05}s both`
                 }}
               >
-                <TableCell className="font-semibold text-white whitespace-normal break-words max-w-[12rem]">
+                <TableCell className="pl-4 font-semibold text-white whitespace-normal break-words max-w-[12rem]">
                   {company.name}
                 </TableCell>
                 <TableCell className="text-gray-200 font-medium whitespace-normal break-words max-w-[8rem]">
@@ -188,14 +197,20 @@ export function CompanyTable({ filters }: CompanyTableProps) {
                   {company.driveType}
                 </TableCell>
                 <TableCell>
-                  <a
-                    href={company.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 underline font-medium transition-colors duration-200"
-                 >
-                    {company.link ? <span>open</span> : <span> close </span>}
-                  </a>
+                  {company.link ? (
+                    <a
+                      href={company.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 underline font-medium transition-colors duration-200"
+                    >
+                      <Link2/>
+                    </a>
+                  ) : (
+                    <span className="text-gray-500 font-medium">
+                      <CircleOff />
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <div className="flex">
@@ -273,13 +288,9 @@ export function CompanyTable({ filters }: CompanyTableProps) {
         companyId={selectedCompany}
         isOpen={!!selectedCompany}
         onClose={() => setSelectedCompany(null)}
-        companies={(companies ?? []).map((c: any) => ({
-          _id: c._id,
-          name: c.name,
-          status: c.status ?? "",
-          statusDateTime: c.statusDateTime,
-        }))}
+        companies={modalCompanies}
       />
+      
       {docModalCompany && (
         <CompanyDocumentModal
           isOpen={!!docModalCompany}

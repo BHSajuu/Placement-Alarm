@@ -112,18 +112,20 @@ export const updateCompanyDetails = mutation({
             await ctx.db
                   .patch(args.companyId, {
                         status: args.status,
-                        statusDateTime: args.statusDateTime,
                   });
             
-            // If status and date are provided, create a historical status event
-            if(args.status && args.statusDateTime){
-                  await ctx.db.insert("statusEvents",{
-                        companyId: args.companyId,
-                        userId: userId,
-                        status: args.status,
-                        eventDate: args.statusDateTime,
-                        notes: args.notes,
-                  })
+
+            if (args.status) {
+              
+              const eventDate = args.statusDateTime || new Date().toISOString();
+
+              await ctx.db.insert("statusEvents", {
+                companyId: args.companyId,
+                userId: userId,
+                status: args.status,
+                eventDate: eventDate,       
+                notes: args.notes,         
+              });
             }
             return {success: true};
       },
