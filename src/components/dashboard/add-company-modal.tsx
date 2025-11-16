@@ -81,7 +81,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
         hour24 = 0
       }
       
-      // FIX: Create a date object from local time components and convert to UTC ISO string
+      //  Create a date object from local time components and convert to UTC ISO string
       const dateParts = deadlineDate.split("-").map(part => parseInt(part, 10));
       const localDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], hour24, parseInt(timeMinute));
       
@@ -95,7 +95,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-gray-800 border-gray-700">
+      <DialogContent className="sm:max-w-[425px] bg-gray-950 border-gray-700 text-white shadow-2xl shadow-blue-300/30">
         <DialogHeader>
           <DialogTitle className="text-white">Add New Company</DialogTitle>
         </DialogHeader>
@@ -111,7 +111,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                 value={formData.name}
                 onChange={(e) => updateField("name", e.target.value)}
                 placeholder="Google"
-                className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                className="bg-gray-900 border-gray-600 text-white placeholder:text-gray-400"
                 required
               />
             </div>
@@ -124,7 +124,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                 value={formData.role}
                 onChange={(e) => updateField("role", e.target.value)}
                 placeholder="Software Engineer"
-                className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                className="bg-gray-900 border-gray-600 text-white placeholder:text-gray-400"
                 required
               />
             </div>
@@ -139,7 +139,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                 value={formData.package}
                 onChange={(e) => updateField("package", e.target.value)}
                 placeholder="₹50 LPA"
-                className=" bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                className=" bg-gray-900 border-gray-600 text-white placeholder:text-gray-400"
                 required
               />
             </div>
@@ -148,7 +148,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                 Drive Type
               </Label>
               <Select value={formData.driveType} onValueChange={(value) => updateField("driveType", value)}>
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger className="bg-gray-900 border-gray-600 text-white">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700">
@@ -173,12 +173,12 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                   id="deadline-date"
                   value={deadlineDate}
                   onChange={(e) => setDeadlineDate(e.target.value)}
-                  className={`bg-gray-700 border-gray-600 ${deadlineDate ? 'text-white' : 'text-gray-400'} placeholder:text-gray-400`}
+                  className={`bg-gray-800 border-gray-600 ${deadlineDate ? 'text-white' : 'text-gray-400'} placeholder:text-gray-400`}
                   required
                 />
                 <div className="flex gap-2">
                   <Select value={timeHour} onValueChange={setTimeHour}>
-                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white w-20">
+                    <SelectTrigger className="bg-gray-900 border-gray-600 text-white w-20">
                       <SelectValue placeholder="Hr" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-700">
@@ -190,7 +190,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                     </SelectContent>
                   </Select>
                   <Select value={timeMinute} onValueChange={setTimeMinute}>
-                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white w-20">
+                    <SelectTrigger className="bg-gray-900 border-gray-600 text-white w-20">
                       <SelectValue placeholder="Min" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-700">
@@ -202,7 +202,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                     </SelectContent>
                   </Select>
                   <Select value={timeAmPm} onValueChange={setTimeAmPm}>
-                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white w-20">
+                    <SelectTrigger className="bg-gray-900 border-gray-600 text-white w-20">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-700">
@@ -222,7 +222,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                 value={formData.link}
                 onChange={(e) => updateField("link", e.target.value)}
                 placeholder="https://company.com"
-                className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                className="bg-gray-900 border-gray-600 text-white placeholder:text-gray-400"
               />
             </div>
           </div>
@@ -232,7 +232,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                 Type
               </Label>
               <Select value={formData.type} onValueChange={(value) => updateField("type", value)}>
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger className="bg-gray-900 border-gray-600 text-white">
                   <SelectValue placeholder="Intern + FTE" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700">
@@ -245,8 +245,8 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                   <SelectItem value="Intern + PPO" className="text-white hover:bg-gray-700">
                     Intern + PPO
                   </SelectItem>
-                  <SelectItem value="Job" className="text-white hover:bg-gray-700">
-                    Job
+                  <SelectItem value="FTE" className="text-white hover:bg-gray-700">
+                    FTE
                   </SelectItem>
                   <SelectItem value="Hackathon" className="text-white hover:bg-gray-700">
                     Hackathon
@@ -259,21 +259,22 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                 Status
               </Label>
               <Select value={formData.status} onValueChange={(value) => updateField("status", value)}>
-                <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger className="bg-gray-900 border-gray-600 text-white">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700">
-                  <SelectItem value="Not Applied" className="text-white hover:bg-gray-700">Not Applied</SelectItem>
-                  <SelectItem value="Applied" className="text-white hover:bg-gray-700">Applied</SelectItem>
-                  <SelectItem value="Shortlisted" className="text-white hover:bg-gray-700">Shortlisted</SelectItem>
-                  <SelectItem value="Pre Placement Talk" className="text-white hover:bg-gray-700">Pre Placement Talk</SelectItem>
-                  <SelectItem value="OA" className="text-white hover:bg-gray-700">OA</SelectItem>
-                  <SelectItem value="Aptitude round" className="text-white hover:bg-gray-700">Aptitude round</SelectItem>
-                  <SelectItem value="GD" className="text-white hover:bg-gray-700">GD</SelectItem>
-                  <SelectItem value="Technical round" className="text-white hover:bg-gray-700">Technical round</SelectItem>
-                  <SelectItem value="Interview" className="text-white hover:bg-gray-700">Interview</SelectItem>
-                  <SelectItem value="Offer" className="text-white hover:bg-gray-700">Offer</SelectItem>
-                  <SelectItem value="Rejected" className="text-white hover:bg-gray-700">Rejected</SelectItem>
+                <SelectContent className="bg-[#7886C7] border-gray-700">
+                  <SelectItem value="Not Applied" className="text-black hover:bg-gray-700">Not Applied</SelectItem>
+                  <SelectItem value="Applied" className="text-black hover:bg-gray-700">Applied</SelectItem>
+                  <SelectItem value="Shortlisted" className="text-black hover:bg-gray-700">Shortlisted</SelectItem>
+                  <SelectItem value="Not Shortlisted" className="text-black hover:bg-gray-700">Not Shortlisted</SelectItem>
+                  <SelectItem value="Pre Placement Talk" className="text-black hover:bg-gray-700">Pre Placement Talk</SelectItem>
+                  <SelectItem value="OA" className="text-black hover:bg-gray-700">OA</SelectItem>
+                  <SelectItem value="OA not clear" className="text-black hover:bg-gray-700">OA not clear</SelectItem>
+                  <SelectItem value="GD" className="text-black hover:bg-gray-700">GD</SelectItem>
+                  <SelectItem value="Technical round" className="text-black hover:bg-gray-700">Technical round</SelectItem>
+                  <SelectItem value="Interview" className="text-black hover:bg-gray-700">Interview</SelectItem>
+                  <SelectItem value="Offer" className="text-black hover:bg-gray-700">Offer</SelectItem>
+                  <SelectItem value="Rejected" className="text-black hover:bg-gray-700">Rejected</SelectItem>
                 </SelectContent>
               </Select>
             </div>

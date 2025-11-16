@@ -23,6 +23,7 @@ import { Id } from "../../../convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Input } from "../ui/input";
+import { Loader2 } from "lucide-react";
 
 interface StatusUpdateModalProps {
   companyId: Id<"companies"> | null;
@@ -118,10 +119,10 @@ export function StatusUpdateModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 border-gray-700">
+      <DialogContent className="  bg-gray-950 border-gray-700 text-white shadow-2xl shadow-blue-300/30">
         <DialogHeader>
-          <DialogTitle className="text-white">
-            Update Application Details for {company?.name}.
+          <DialogTitle className="text-white md:text-sm">
+            Update Application Details for <span className="text-blue-300">{company?.name}.</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -131,26 +132,25 @@ export function StatusUpdateModal({
             Status
           </Label>
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+            <SelectTrigger className="bg-gray-900 border-gray-600 text-white">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-700">
+            <SelectContent className="bg-[#7886C7] border-gray-700">
               {[
                 "Not Applied",
                 "Applied",
                 "Not Shortlisted",
                 "Shortlisted",
-                "Pre Placement Talk",
+                "PPT",
                 "OA",
                 "OA not clear",
-                "Aptitude round",
                 "GD",
                 "Technical round",
                 "Interview",
                 "Offer",
                 "Rejected",
               ].map((s) => (
-                <SelectItem key={s} value={s} className="text-white hover:bg-gray-700">
+                <SelectItem key={s} value={s} className="text-black ">
                   {s}
                 </SelectItem>
               ))}
@@ -163,17 +163,17 @@ export function StatusUpdateModal({
             <Label htmlFor="statusDateTime" className="text-gray-300">
               Status Date & Time (Optional)
             </Label>
-            <div className="space-y-2 flex gap-4">
+            <div className="space-y-2 flex flex-col md:flex-row gap-4">
               <Input
                 type="date"
                 id="status-date"
                 value={statusDate}
                 onChange={(e) => setStatusDate(e.target.value)}
-                className={`bg-gray-700 border-gray-600 ${statusDate ? 'text-white' : 'text-gray-400'} placeholder:text-gray-400`}
+                className={`bg-gray-800 border-gray-600 w-44 ${statusDate ? 'text-white' : 'text-gray-400'} placeholder:text-gray-400`}
               />
-              <div className="flex gap-2">
+              <div className="flex gap-2 ">
                 <Select value={timeHour} onValueChange={setTimeHour}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white w-20">
+                  <SelectTrigger className="bg-gray-900 border-gray-600 text-white w-20">
                     <SelectValue placeholder="Hr" />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 border-gray-700">
@@ -185,7 +185,7 @@ export function StatusUpdateModal({
                   </SelectContent>
                 </Select>
                 <Select value={timeMinute} onValueChange={setTimeMinute}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white w-20">
+                  <SelectTrigger className="bg-gray-900 border-gray-600 text-white w-20">
                     <SelectValue placeholder="Min" />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 border-gray-700">
@@ -197,7 +197,7 @@ export function StatusUpdateModal({
                   </SelectContent>
                 </Select>
                 <Select value={timeAmPm} onValueChange={setTimeAmPm}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white w-20">
+                  <SelectTrigger className="bg-gray-900 border-gray-600 text-white w-20">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 border-gray-700">
@@ -209,14 +209,14 @@ export function StatusUpdateModal({
             </div>
           </div>
           
-          <div className="flex flex-col">
+          <div className="flex flex-col md:mr-4">
             <Label htmlFor="company-note" className="mb-1 text-gray-300">
               Add a Note (optional)
             </Label>
             <textarea
               id="company-note"
               rows={4}
-              className="bg-gray-700 border border-gray-600 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-gray-900 border border-gray-600 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="e.g. Interview scheduled for next week…"
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -224,7 +224,7 @@ export function StatusUpdateModal({
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="md:mr-6">
           <Button
             variant="outline"
             onClick={onClose}
@@ -235,11 +235,11 @@ export function StatusUpdateModal({
           <Button
             onClick={handleUpdate}
             disabled={isLoading || !companyId}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0"
+            className="bg-green-300 hover:bg-green-600  text-gray-900 border-0"
           >
             {isLoading ? (
               <>
-                <div className="spinner mr-2" /> Updating...
+                <Loader2 className="spinner  text-gray-950" /> Updating...
               </>
             ) : (
               "Update"

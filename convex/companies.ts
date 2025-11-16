@@ -29,7 +29,7 @@ export const addCompany = mutation({
             }
             return await ctx.db.insert("companies", {
                   ...args,
-                  driveType: args.driveType.toLowerCase().replace(/-/g, ""),
+                  driveType: args.driveType,
                   userId: Identify.subject,
                   remindersSent: 0,
                   lastReminderAt: "",

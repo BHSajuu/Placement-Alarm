@@ -146,7 +146,7 @@ const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => 
 
         <div className="bg-gray-800/40 backdrop-blur-3xl rounded-3xl border border-gray-700/50 shadow-2xl overflow-hidden">
           {/* Header Section */}
-          <div className="relative bg-gradient-to-r from-blue-300/20 via-blue-600/20 to-blue-600/20 p-8 border-b border-gray-700/50">
+          <div className="relative bg-gradient-to-r from-blue-300/20 via-blue-600/20 to-blue-600/20 py-4 md:p-8 border-b border-gray-700/50">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/5 to-pink-600/5"></div>
             <div className="relative flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
               {/* Profile Image */}
@@ -186,19 +186,19 @@ const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => 
                   {formData.name || "User Profile"}
                 </h1>
                 <p className="text-gray-400 text-lg mb-4">{formData.email}</p>
-                <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                  <div className="flex items-center space-x-2 bg-gray-700/30 rounded-full px-4 py-2">
+                <div className="flex  md:flex-wrap justify-center md:justify-start gap-3">
+                  <div className="flex items-center space-x-2 bg-gray-700/30 rounded-full p-2 md:px-4 md:py-2">
                     <Shield className="h-4 w-4 text-green-400" />
                     <span className="text-sm text-gray-300">Verified Account</span>
                   </div>
-                  <div className="flex items-center space-x-2 bg-gray-700/30 rounded-full px-4 py-2">
+                  <div className="flex items-center space-x-2 bg-gray-700/30 rounded-full p-2 md:px-4 md:py-2">
                     <Bell className="h-4 w-4 text-blue-400" />
                     <span className="text-sm text-gray-300">Notifications Active</span>
                   </div>
                 </div>
               </div>
 
-             <div className="flex flex-col items-center gap-6 mt-6 md:mt-0">
+             <div className="flex md:flex-col items-center gap-6 ">
                {/* Edit Button */}
               {!isEditing ? (
                 <Button

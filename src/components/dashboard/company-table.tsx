@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, Trash2, FileText, Loader2, Files } from "lucide-react"
+import { Edit, Trash2, FileText,  Dock } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { Building2 } from "lucide-react"
 import toast from "react-hot-toast"
@@ -152,23 +152,22 @@ export function CompanyTable({ filters }: CompanyTableProps) {
   } 
   
 
-  //  Finally: we have a non‐empty array, render the table
   if(companies.length > 0){return (
     <>
       <div className="  rounded-xl border border-gray-700/50 overflow-hidden shadow-2xl backdrop-blur-sm">
-        <Table >
+        <Table className="table-fixed w-full">
           <TableHeader className=" bg-gray-950  backdrop-blur-lg shadow-lg">
-            <TableRow className="border-gray-700/50 hover:bg-gray-800/30">
-              <TableHead className="text-gray-200 font-semibold">Company</TableHead>
-              <TableHead className="text-gray-200 font-semibold">Role</TableHead>
-              <TableHead className="text-gray-200 font-semibold">Type</TableHead>
-              <TableHead className="text-gray-200 font-semibold">Package</TableHead>
-              <TableHead className="text-gray-200 font-semibold">Deadline</TableHead>
-              <TableHead className="text-gray-200 font-semibold">Status</TableHead>
-              <TableHead className="text-gray-200 font-semibold">Drive Type</TableHead>
-              <TableHead className="text-gray-200 font-semibold">Notes</TableHead>
-              <TableHead className="text-gray-200 font-semibold">Link</TableHead>
-              <TableHead className="text-gray-200 font-semibold">Actions</TableHead>
+             <TableRow className="border-gray-700/50 hover:bg-gray-800/30">
+              <TableHead className="w-48 text-gray-200 font-semibold ">Company</TableHead>
+              <TableHead className="w-26 text-gray-200 font-semibold ">Role</TableHead>
+              <TableHead className="w-24 text-gray-200 font-semibold ">Type</TableHead>
+              <TableHead className="w-20 text-gray-200 font-semibold ">Package</TableHead>
+              <TableHead className="w-28 text-gray-200 font-semibold ">Deadline</TableHead>
+              <TableHead className="w-30 text-gray-200 font-semibold ">Status</TableHead>
+              <TableHead className="w-26 text-gray-200 font-semibold ">Drive Type</TableHead>
+              <TableHead className="w-20 text-gray-200 font-semibold ">Notes</TableHead>
+              <TableHead className="w-16 text-gray-200 font-semibold ">Link</TableHead>
+              <TableHead className="w-28 text-gray-200 font-semibold ">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -181,31 +180,31 @@ export function CompanyTable({ filters }: CompanyTableProps) {
                   animation: `fadeInUp 0.6s ease-out ${index * 0.05}s both`
                 }}
               >
-                <TableCell className="font-semibold text-white">
+                <TableCell className="font-semibold text-white whitespace-normal break-words max-w-[12rem]">
                   {company.name}
                 </TableCell>
-                <TableCell className="text-gray-200 font-medium">
+                <TableCell className="text-gray-200 font-medium whitespace-normal break-words max-w-[8rem]">
                   {company.role}
                 </TableCell>
-                <TableCell className="text-gray-200 font-medium">
+                <TableCell className="text-gray-200 font-medium whitespace-normal break-words max-w-[7rem]">
                   {company.type}
                 </TableCell>
 
-                <TableCell className="text-gray-200 font-bold">
+                <TableCell className="text-gray-200 font-bold whitespace-normal break-words max-w-[7rem]">
                   {company.package}
                 </TableCell>
-                <TableCell className="text-gray-300 font-medium">
+                <TableCell className="text-gray-300 font-medium whitespace-normal break-words max-w-[7rem]">
                   {formatDate(company.deadline || new Date())}
                 </TableCell>
-                <TableCell>
+                <TableCell >
                   <div className="space-y-1">
                     <Badge
-                      className={`${getStatusColor(company.status ?? "")} border font-medium shadow-sm`}
+                      className={`${getStatusColor(company.status ?? "")}  border font-medium shadow-sm`}
                     >
                       {company.status}
                     </Badge>
                     {company.statusDateTime && (
-                      <div className="text-xs text-gray-400 font-medium">
+                      <div className="text-xs text-gray-400 font-medium whitespace-normal break-words max-w-[10rem]">
                         {new Date(company.statusDateTime).toLocaleString("en-US", {
                           month: "short",
                           day: "numeric",
@@ -218,12 +217,12 @@ export function CompanyTable({ filters }: CompanyTableProps) {
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="text-gray-200 font-medium">
+                <TableCell className="text-gray-200 font-medium whitespace-normal break-words max-w-[8rem]">
                   {company.driveType}
                 </TableCell>
                 <TableCell>
                   <div
-                    className={`text-gray-300 font-medium cursor-pointer hover:text-blue-400 transition-colors duration-200 flex items-center gap-1 ${
+                    className={`text-gray-300 font-medium cursor-pointer hover:text-blue-400 transition-colors duration-200 flex items-center gap-1 whitespace-normal break-words max-w-[12rem]${
                       company.notes && company.notes.trim() !== "" ? "hover:underline" : ""
                     }`}
                     onClick={(e) => handleNoteClick(company.notes || "", e)}
@@ -247,7 +246,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
                   </a>
                 </TableCell>
                 <TableCell>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-1">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -256,7 +255,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
                       }
                       className="text-green-400 hover:text-green-300 hover:bg-green-500/20 transition-all duration-300 hover:scale-110"
                     >
-                      <Files className="h-4 w-4" />
+                      <Dock className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"

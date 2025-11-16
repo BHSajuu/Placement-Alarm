@@ -41,7 +41,8 @@ export function CompanyFilters({ filters, onFiltersChange }: CompanyFiltersProps
           className="rounded-full bg-gray-700/50 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-500 focus:bg-gray-700/70 transition-all duration-300 backdrop-blur-sm shadow-lg"
         />
       </div>
-      <Select value={filters.status} onValueChange={(value) => updateFilter("status", value)}>
+     <div className="flex flex-row gap-3 lg:gap-10">
+        <Select value={filters.status} onValueChange={(value) => updateFilter("status", value)}>
         <SelectTrigger className="w-full rounded-full sm:w-[180px] bg-gray-700/50 border-gray-600/50 text-white backdrop-blur-sm shadow-lg">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
@@ -79,6 +80,7 @@ export function CompanyFilters({ filters, onFiltersChange }: CompanyFiltersProps
           </SelectItem>
         </SelectContent>
       </Select>
+     </div>
       {hasActiveFilters && (
         <Button
           variant="outline"

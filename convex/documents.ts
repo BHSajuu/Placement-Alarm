@@ -64,46 +64,6 @@ export const getCompanyDocuments = query({
   },
 });
 
-// --- UPDATED QUERY ---
-// Gets *all* documents, general and company-specific, for the global page
-export const getAllDocuments = query({
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
-    const userId = identity.subject;
-
-    // 1. Get all documents for the user
-    const documents = await ctx.db
-      .query("documents")
-      .withIndex("by_user_id", (q) => q.eq("userId", userId))
-      .order("desc")
-      .collect();
-
-    // 2. Get all companies for the user
-    const companies = await ctx.db
-      .query("companies")
-      .withIndex("by_user_id", (q) => q.eq("userId", userId))
-      .collect();
-
-    // Create a quick lookup map for company names
-    const companyNameMap = new Map(companies.map(c => [c._id, c.name]));
-
-    // 3. Get file URLs and map company names
-    return Promise.all(
-      documents.map(async (doc) => {
-        const url = await ctx.storage.getUrl(doc.storageId);
-        return {
-          ...doc,
-          url: url || null,
-          companyName: doc.companyId ? companyNameMap.get(doc.companyId) || null : null,
-        };
-      })
-    );
-  },
-});
-
 
 export const deleteDocument = mutation({
   args: {

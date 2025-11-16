@@ -18,14 +18,8 @@ export function DashboardHeader() {
 
   const handleAddCompany = () => {
     if (!isSignedIn) {
-      toast.custom((t) => (
-        <div className={`bg-gradient-to-r from-blue-500/90 to-purple-600/90 backdrop-blur-sm border border-blue-400/30 text-white px-6 py-3 rounded-lg shadow-xl flex items-center space-x-3 transform transition-all duration-300 ${t.visible ? "scale-100 opacity-100" : "scale-95 opacity-0"
-          }`}>
-          <LogIn className="w-5 h-5 text-blue-500" />
-          <span className="font-medium">Please sign in to add a company.</span>
-        </div>
-      ))
-      return
+      toast.error("Please sign in to add a company.");
+      return;
 
     }
     setIsModalOpen(true)
@@ -37,22 +31,22 @@ export function DashboardHeader() {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mr-32" style={{
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 " style={{
         animation: "fadeInUp 0.8s ease-out"
       }}>
         <div className="space-y-2 ">
           <div className="flex items-center space-x-3 ">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-blue-200 to-purple-300 bg-clip-text text-transparent tracking-tight">
+            <h1 className="text-2xl lg:text-5xl font-bold bg-gradient-to-r from-white via-blue-200 to-purple-300 bg-clip-text text-transparent tracking-tight">
               Placement-Alarm
             </h1>
-            <Sparkles className="h-7 w-7 text-yellow-400" style={{
-              animation: "pulse 2s ease-in-out infinite"
+            <Sparkles className="lg:h-7 lg:w-7 text-yellow-400" style={{
+              animation: "pulse 2s ease-in-out infinite" 
             }} />
           </div>
-          <p className="text-slate-300 text-lg font-medium">Track your applications and land your dream job</p>
+          <p className="text-slate-300 text-xs lg:text-lg font-medium">Track your applications and land your dream job</p>
         </div>
 
-        <div className="flex items-start gap-16">
+        <div className="flex items-center justify-center gap-16 mr-5 lg:mr-16">
 
           <Button
             onClick={handleAddCompany}
@@ -64,7 +58,7 @@ export function DashboardHeader() {
           <Unauthenticated>
             <SignInButton mode="modal">
               <div
-                className="cursor-pointer bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/30 flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-semibold"
+                className="cursor-pointer bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/30 flex items-center gap-2 p-3 lg:px-6 lg:py-3 rounded-lg transition-all duration-300 transform hover:scale-105 font-semibold"
               >
                 <LogIn className="h-5 w-5 mr-2" />
                 <span>Sign In</span>
@@ -74,15 +68,6 @@ export function DashboardHeader() {
 
           </Unauthenticated>
           <SignedIn>
-            <Button
-              asChild
-              className="bg-gray-700/50 border border-gray-600/50 text-white hover:bg-gray-600/70 transition-all duration-300 transform hover:scale-105 rounded-full px-6 py-3"
-            >
-              <Link href="/documents">
-                <FileText className="h-4 w-4 mr-2" />
-                Manage Documents
-              </Link>
-            </Button>
             <Link href="/profile">
               <div className="group relative">
                 <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300 group-hover:duration-200 animate-pulse"></div>

@@ -50,19 +50,19 @@ export function CompanyDocumentModal({ isOpen, onClose, companyId, companyName }
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[625px] bg-gray-800 border-gray-700 text-white">
+      <DialogContent className="sm:max-w-[625px] bg-gray-950 border-gray-700 text-white shadow-2xl shadow-blue-300/30 ">
         <DialogHeader>
           <DialogTitle className="text-white text-2xl">
             Documents for <span className="text-blue-400">{companyName}</span>
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
+        <div className="space-y-4">
           <div className="flex justify-end">
             <UploadDocumentButton companyId={companyId} />
           </div>
 
-          <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+          <div className="pb-2 px-2 space-y-3 max-h-96 overflow-y-auto">
             {documents === undefined && (
               <div className="flex justify-center items-center h-24">
                 <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
@@ -80,7 +80,7 @@ export function CompanyDocumentModal({ isOpen, onClose, companyId, companyName }
             {documents && documents.map((document) => (
               <div 
                 key={document._id} 
-                className="bg-gray-700/50 backdrop-blur-3xl rounded-2xl border border-gray-700/50 p-4 flex items-center justify-between shadow-lg"
+                className="bg-gray-700/50  rounded-2xl border border-gray-700/50 px-4 py-3 flex items-center justify-between hover:shadow-md hover:shadow-blue-200  transition-all duration-300"
               >
                 <div className="flex items-center gap-4 overflow-hidden">
                   <FileText className="h-5 w-5 text-blue-400 flex-shrink-0" />
