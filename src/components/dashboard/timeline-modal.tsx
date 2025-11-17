@@ -13,6 +13,7 @@ import { formatDate } from "@/lib/utils"
 import { Loader2, CalendarClock, ListChecks, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
 import { Button } from "../ui/button"
+import { getStatusColor } from "@/lib/constants"
 
 interface TimelineModalProps {
   isOpen: boolean
@@ -48,40 +49,7 @@ export function TimelineModal({
       });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Not Applied":
-        return "bg-gray-700/20 text-gray-300 border-gray-700/30"
-      case "Applied":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30"
-      case "Shortlisted":
-        return "bg-orange-500/20 text-orange-400 border-orange-500/30"
-      case "Not Shortlisted":
-        return "bg-red-300/20 text-orange-400 border-orange-500/30"
-      case "Pre Placement Talk":
-        return "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
-      case "OA":
-        return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30"
-      case "OA not clear":
-        return "bg-yellow-600/20 text-cyan-400 border-cyan-500/30"
-      case "Aptitude round":
-        return "bg-teal-500/20 text-teal-400 border-teal-500/30"
-      case "GD":
-        return "bg-pink-500/20 text-pink-400 border-pink-500/30"
-      case "Technical round":
-        return "bg-purple-500/20 text-purple-400 border-purple-500/30"
-      case "Interview":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-      case "Offer":
-        return "bg-green-500/20 text-green-400 border-green-500/30"
-      case "Rejected":
-        return "bg-red-500/20 text-red-400 border-red-500/30"
-      default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30"
-    }
-  }
-
-  return (
+ return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[525px] bg-gray-950 border-gray-700 text-white shadow-2xl shadow-blue-300/30">
         <DialogHeader>
