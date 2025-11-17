@@ -65,7 +65,7 @@ export function NotificationBell() {
         variant="ghost" 
         size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative group bg-gray-900 rounded-full p-3 hover:bg-gray-800 transition-all duration-300 transform hover:scale-110 border border-purple-500/30"
+        className="relative group bg-gray-900 rounded-full p-6 hover:bg-gray-800 transition-all duration-300 transform hover:scale-110 border border-purple-500/30"
       >
         <Bell className="h-5 w-5 text-purple-400 group-hover:text-purple-300" />
         {unreadCount > 0 && (
@@ -76,7 +76,7 @@ export function NotificationBell() {
       </Button>
       {isOpen && (
         <div 
-          className="absolute top-12 right-0 w-96 max-w-sm bg-gray-900/90 border border-gray-700/50 rounded-2xl shadow-2xl shadow-blue-500/20 backdrop-blur-lg z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-top-4 duration-200"
+          className="absolute top-20 -left-56  md:-left-96 w-96 md:w-[500px] max-w-xl bg-gray-900/90 border border-gray-700/50 rounded-2xl shadow-2xl shadow-blue-500/20 backdrop-blur-lg z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-top-4 duration-200"
         >
           <div className="flex items-center justify-between p-4 border-b border-gray-700/50">
             <h4 className="text-lg font-semibold bg-gradient-to-r from-white via-blue-200 to-purple-300 bg-clip-text text-transparent">
@@ -121,10 +121,10 @@ export function NotificationBell() {
                   <div
                     key={notification._id}
                     onClick={() => handleNotificationClick(notification)}
-                    className="flex items-start gap-3 p-4 hover:bg-gray-800/60 cursor-pointer transition-colors"
+                    className="flex items-start gap-3 mx-2 p-4 hover:bg-blue-100/20 rounded-3xl cursor-pointer transition-colors"
                   >
-                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 flex items-center justify-center border border-gray-700/50">
-                      <Bell className="w-4 h-4 text-blue-300" />
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-r from-yellow-500/20 to-yellow-500/20 flex items-center justify-center border border-gray-700/50">
+                      <Bell className="w-4 h-4 text-yellow-300" />
                     </div>
                     <div className="flex-1">
                       <p className="text-sm text-gray-200 leading-snug">

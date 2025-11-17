@@ -84,7 +84,7 @@ export async function GET(_request: Request) {
         // IMPORTANT: Increment reminder count after sending
         await convex.mutation(api.companies.incrementReminderCount, { id: _id });
 
-        const message = `Your application for ${role} at ${name} is due in ~${reminderThresholds[reminderIndex]} hour(s).`;
+        const message = `Your application for ${role} at ${name} is due on ${when}.`;
         await convex.mutation(api.notifications.logNotification, {
           userId,
           message,

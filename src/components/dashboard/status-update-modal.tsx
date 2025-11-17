@@ -51,8 +51,10 @@ export function StatusUpdateModal({
 
   const updateCompanyDetails = useMutation(api.companies.updateCompanyDetails);
 
+  
   const updateStatusDateTime = () => {
     if (statusDate && timeHour && timeMinute) {
+      // Case 1: User provided full date and time
       let hour24 = parseInt(timeHour);
       if (timeAmPm === "PM" && hour24 !== 12) {
         hour24 += 12;
@@ -63,9 +65,19 @@ export function StatusUpdateModal({
       const time24 = `${hour24.toString().padStart(2, '0')}:${timeMinute.padStart(2, '0')}`;
       const combinedDateTime = `${statusDate}T${time24}`;
       setStatusDateTime(combinedDateTime);
+    } else if (statusDate) {
+      // Case 2: User provided ONLY date, so default to current time
+      const now = new Date();
+      const currentHour = now.getHours().toString().padStart(2, '0');
+      const currentMinute = now.getMinutes().toString().padStart(2, '0');
+      
+      const combinedDateTime = `${statusDate}T${currentHour}:${currentMinute}`;
+      setStatusDateTime(combinedDateTime);
+    } else {
+      // Case 3: No date provided, clear the datetime
+      setStatusDateTime("");
     }
   };
-
   useEffect(() => {
     if (company) {
       setStatus(company.status);

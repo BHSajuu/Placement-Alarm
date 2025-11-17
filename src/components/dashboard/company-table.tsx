@@ -147,10 +147,10 @@ export function CompanyTable({ filters }: CompanyTableProps) {
         <Table className="table-fixed w-full">
           <TableHeader className=" bg-gray-950  backdrop-blur-lg shadow-lg">
              <TableRow className="border-gray-700/50 hover:bg-gray-800/30">
-              <TableHead className="w-48 pl-10 text-gray-200 font-semibold ">Company</TableHead>
-              <TableHead className="w-26 text-gray-200 font-semibold ">Role</TableHead>
+              <TableHead className="w-46 pl-10 text-gray-200 font-semibold ">Company</TableHead>
+              <TableHead className="w-28 text-gray-200 font-semibold ">Role</TableHead>
               <TableHead className="w-21 text-gray-200 font-semibold ">Type</TableHead>
-              <TableHead className="w-22 text-gray-200 font-semibold ">Package</TableHead>
+              <TableHead className="w-23 text-gray-200 font-semibold ">Package</TableHead>
               <TableHead className="w-31 pl-10 text-gray-200 font-semibold ">Deadline</TableHead>
               <TableHead className="w-24 text-gray-200 font-semibold ">Status</TableHead>
               <TableHead className="w-20 text-gray-200 font-semibold ">Drive Type</TableHead>
@@ -162,7 +162,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
             {companies?.map((company, index) => (
               <TableRow
                 key={company._id}
-                className="border-gray-700/50 hover:bg-gray-800/30 transition-all duration-300 hover:shadow-lg"
+                className="border-gray-700/50 hover:bg-slate-950/70  transition-all duration-300 hover:shadow-lg"
                 style={{ 
                   animationDelay: `${index * 0.05}s`,
                   animation: `fadeInUp 0.6s ease-out ${index * 0.05}s both`

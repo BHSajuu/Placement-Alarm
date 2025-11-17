@@ -42,7 +42,20 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.name || !formData.role || !formData.package || !formData.driveType || !formData.deadline || !formData.type) {
+
+    let finalDeadline = formData.deadline;
+
+    // Check if a date is picked, but time fields are empty
+    if (deadlineDate && (!timeHour || !timeMinute)) {
+      // Create a date object from the provided date
+      const dateParts = deadlineDate.split("-").map(part => parseInt(part, 10));
+      // Set time to 23:59:59 (End of Day) in local timezone
+      const eodDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 23, 59, 59);
+      finalDeadline = eodDate.toISOString();
+    }
+
+    // Use the new 'finalDeadline' variable for validation
+    if (!formData.name || !formData.role || !formData.package || !formData.driveType || !finalDeadline || !formData.type) {
       toast.error("Please fill in all required fields")
       return
     }
@@ -50,7 +63,10 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
     setIsLoading(true)
     try {
       
-      await addCompany(formData);
+      await addCompany({
+        ...formData,
+        deadline: finalDeadline 
+      });
 
       toast.success("Company added successfully")
       setFormData({ name: "", role: "", package: "", driveType: "", deadline: "", link: "", type: "", status: "" })
