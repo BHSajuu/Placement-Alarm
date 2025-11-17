@@ -82,7 +82,7 @@ export function UploadDocumentButton({ companyId }: UploadDocumentButtonProps) {
   return (
   <Button
     asChild
-    className=" bg-green-300 hover:bg-green-400 text-slate-600 hover:text-gray-900 rounded-2xl transition-all duration-300 hover:scale-105 px-6 py-3 font-semibold"
+    className=" mr-10 md:mr-3 bg-green-300 hover:bg-green-400 text-slate-600 hover:text-gray-900 rounded-2xl transition-all duration-300 hover:scale-105 px-6 py-3 font-semibold"
   >
     <label htmlFor="document-upload" className="cursor-pointer flex items-center">
       {isUploading ? (

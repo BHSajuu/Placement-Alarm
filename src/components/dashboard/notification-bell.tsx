@@ -76,7 +76,7 @@ export function NotificationBell() {
       </Button>
       {isOpen && (
         <div 
-          className="absolute top-20 -left-56  md:-left-96 w-96 md:w-[500px] max-w-xl bg-gray-900/90 border border-gray-700/50 rounded-2xl shadow-2xl shadow-blue-500/20 backdrop-blur-lg z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-top-4 duration-200"
+          className="absolute top-20 -left-51  md:-left-96 w-96 md:w-[500px] max-w-xl bg-gray-900/90 border border-gray-700/50 rounded-2xl shadow-2xl shadow-blue-500/20 backdrop-blur-lg z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-top-4 duration-200"
         >
           <div className="flex items-center justify-between p-4 border-b border-gray-700/50">
             <h4 className="text-lg font-semibold bg-gradient-to-r from-white via-blue-200 to-purple-300 bg-clip-text text-transparent">

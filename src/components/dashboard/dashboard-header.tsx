@@ -35,9 +35,9 @@ export function DashboardHeader() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 " style={{
         animation: "fadeInUp 0.8s ease-out"
       }}>
-        <div className="space-y-2 ">
+        <div className="space-y-1 ">
           <div className="flex items-center space-x-3 ">
-            <h1 className="text-2xl lg:text-5xl font-bold bg-gradient-to-r from-white via-blue-200 to-purple-300 bg-clip-text text-transparent tracking-tight">
+            <h1 className="text-3xl lg:text-5xl font-bold bg-gradient-to-r from-white via-blue-200 to-purple-300 bg-clip-text text-transparent tracking-tight">
               Placement-Alarm
             </h1>
             <Sparkles className="lg:h-7 lg:w-7 text-yellow-400" style={{
@@ -47,7 +47,7 @@ export function DashboardHeader() {
           <p className="text-slate-300 text-xs lg:text-lg font-medium">Track your applications and land your dream job</p>
         </div>
 
-        <div className="flex items-center justify-center gap-16 mr-5 lg:mr-16">
+        <div className="flex items-center justify-center gap-8 md:gap-16 mr-5 lg:mr-16">
 
           <Button
             onClick={handleAddCompany}

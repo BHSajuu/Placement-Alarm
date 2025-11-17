@@ -189,7 +189,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                   id="deadline-date"
                   value={deadlineDate}
                   onChange={(e) => setDeadlineDate(e.target.value)}
-                  className={`bg-gray-800 border-gray-600 ${deadlineDate ? 'text-white' : 'text-gray-400'} placeholder:text-gray-400`}
+                  className={`w-38 bg-gray-800 border-gray-600 ${deadlineDate ? 'text-white' : 'text-gray-400'} placeholder:text-gray-400`}
                   required
                 />
                 <div className="flex gap-2">
@@ -229,7 +229,7 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                 </div>
               </div>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 ml-2">
               <Label htmlFor="link" className="text-gray-300">
                 Apply Link
               </Label>

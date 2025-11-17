@@ -87,7 +87,7 @@ export function CompanyTable({ filters }: CompanyTableProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Not Applied":
-        return "bg-gray-700/20 text-gray-300 border-gray-700/30"
+        return "bg-yellow-700/20 text-gray-300 border-gray-700/30"
       case "Applied":
         return "bg-blue-500/20 text-blue-400 border-blue-500/30"
       case "Shortlisted":

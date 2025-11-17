@@ -61,11 +61,11 @@ export function DashboardStats() {
  
 
   return (
-    <div className="grid grid-cols-2 gap-x-8 gap-y-3 lg:gap-0   lg:grid-cols-4">
+    <div className="grid grid-cols-2  gap-x-6 gap-y-3 lg:gap-0   lg:grid-cols-4">
       {stats.map((stat, index) => (
         <Card
           key={stat.name}
-          className="  mx-auto w-44 h-44 bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700/50 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 hover:scale-105 hover:border-gray-600/50 backdrop-blur-sm"
+          className="  mx-auto w-40 h-40 md:w-44 md:h-44 bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700/50 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 hover:scale-105 hover:border-gray-600/50 backdrop-blur-sm"
           style={{ 
             animationDelay: `${index * 0.1}s`,
             animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
@@ -74,7 +74,7 @@ export function DashboardStats() {
           <CardHeader>
             <div className="flex items-center justify-center">
               <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.gradient} shadow-lg transform transition-transform duration-300 hover:scale-110`}>
-                <stat.icon className="h-6 w-6 text-white" />
+                <stat.icon className="h-4 w-4 md:h-6 md:w-6 text-white" />
               </div>
             </div>
           </CardHeader>
