@@ -6,12 +6,12 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 
-export function formatDate(date: string | Date) {
+export function formatDate(date: string | Date | number) {
   const dateObj = new Date(date);
   
   // Check if the date string includes time information
-  const hasTime = typeof date === 'string' && (date.includes('T') || date.includes(':'));
-  
+ const hasTime = (typeof date === 'string' && (date.includes('T') || date.includes(':'))) || typeof date === 'number';
+
   if (hasTime) {
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",

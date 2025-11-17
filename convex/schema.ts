@@ -55,4 +55,12 @@ export default defineSchema({
             eventDate: v.string(),
             notes: v.optional(v.string()),
             }).index("by_companyId_userId", ["companyId", "userId"]),
+
+      notifications: defineTable({
+            userId: v.string(),
+            message: v.string(),
+            link: v.string(), 
+            read: v.boolean(),
+            }).index("by_userId_read", ["userId", "read"]),
+
 });

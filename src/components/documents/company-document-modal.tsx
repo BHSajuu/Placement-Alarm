@@ -33,9 +33,6 @@ export function CompanyDocumentModal({ isOpen, onClose, companyId, companyName }
   const deleteDocument = useMutation(api.documents.deleteDocument);
 
   const handleDelete = (documentId: Id<"documents">, documentName: string) => {
-    if (!window.confirm(`Are you sure you want to delete "${documentName}"?`)) {
-      return;
-    }
 
     const toastId = toast.loading(`Deleting ${documentName}...`);
     deleteDocument({ documentId })
