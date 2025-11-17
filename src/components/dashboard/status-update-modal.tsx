@@ -24,6 +24,7 @@ import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Input } from "../ui/input";
 import { Loader2 } from "lucide-react";
+import { STATUS_OPTIONS } from "@/lib/constants";
 
 interface StatusUpdateModalProps {
   companyId: Id<"companies"> | null;
@@ -137,20 +138,7 @@ export function StatusUpdateModal({
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent className="bg-[#7886C7] border-gray-700">
-              {[
-                "Not Applied",
-                "Applied",
-                "Not Shortlisted",
-                "Shortlisted",
-                "PPT",
-                "OA",
-                "OA not clear",
-                "GD",
-                "Technical round",
-                "Interview",
-                "Offer",
-                "Rejected",
-              ].map((s) => (
+              {STATUS_OPTIONS.map((s) => (
                 <SelectItem key={s} value={s} className="text-black ">
                   {s}
                 </SelectItem>

@@ -2,6 +2,11 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+const ALLOWED_FILE_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+];
 
 export const generateUploadUrl = mutation(async (ctx) =>{
       return await ctx.storage.generateUploadUrl();
@@ -22,17 +27,38 @@ export const saveDocument = mutation({
           }
           const userId = identity.subject;
 
+     // SERVER-SIDE VALIDATION
+          const metadata = await ctx.storage.getMetadata(args.storageId);
+
+          if (!metadata) {
+            throw new Error("File metadata not found, upload may have failed.");
+          }
+
+          // 1. Validate File Type
+          // First check if contentType exists, then check if it's in the allowed list.
+          if (!metadata.contentType || !ALLOWED_FILE_TYPES.includes(metadata.contentType)) {
+            // If invalid (either no content type or not an allowed one), delete the file.
+            await ctx.storage.delete(args.storageId);
+            throw new Error(`Invalid or missing file type. Only PDF and DOCX are allowed. Got: ${metadata.contentType}`);
+          }
+
+          // 2. Validate File Size
+          if (metadata.size > MAX_FILE_SIZE_BYTES) {
+            // If invalid, delete the file from storage
+            await ctx.storage.delete(args.storageId);
+            throw new Error(`File is too large. Max size: 5MB. Got ${metadata.size} bytes`);
+          }
+
           await ctx.db.insert("documents",{
             userId,
             storageId: args.storageId,
             documentName: args.documentName,
-            fileType: args.fileType,
-            fileSize: args.fileSize,
+            fileType: metadata.contentType, 
+            fileSize: metadata.size,        
             companyId: args.companyId,
           })
       }
 })
-
 
 export const getCompanyDocuments = query({
   args: { 

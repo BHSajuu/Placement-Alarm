@@ -15,7 +15,7 @@ async function fetchUserContact(userId: string) {
     };
   } catch (error) {
     console.error(`Error fetching user contact for ${userId}:`, error);
-    return { email: null, whatsapp: null };
+    return { email: null};
   }
 }
 
@@ -85,10 +85,10 @@ export async function GET(_request: Request) {
         await convex.mutation(api.companies.incrementReminderCount, { id: _id });
 
         const message = `Your application for ${role} at ${name} is due on ${when}.`;
-        await convex.mutation(api.notifications.logNotification, {
+       await convex.action(api.notifications.triggerReminderNotification, {
           userId,
           message,
-          link: "/", // Link to the main dashboard
+          link: "/",
         });
 
         remindersSentCount++;

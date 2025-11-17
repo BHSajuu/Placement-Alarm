@@ -19,7 +19,7 @@ import { StatusUpdateModal } from "./status-update-modal"
 import {  useMutation, usePaginatedQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import {  useAuth, useUser } from "@clerk/nextjs"
-import { Id } from "../../../convex/_generated/dataModel"
+import { Doc, Id } from "../../../convex/_generated/dataModel"
 import { CompaniesTableSkeleton } from "./loadingSkeleton"
 import { CompanyDocumentModal } from "../documents/company-document-modal"
 import { TimelineModal } from "./timeline-modal"
@@ -64,11 +64,10 @@ export function CompanyTable({ filters }: CompanyTableProps) {
   ); 
   
   const modalCompanies = useMemo(() => {
-  return (companies ?? []).map((c: any) => ({
+  return (companies ?? []).map((c: Doc<"companies">) => ({
     _id: c._id,
     name: c.name,
     status: c.status ?? "",
-    statusDateTime: c.statusDateTime,
   }));
 }, [companies]);
 
@@ -95,14 +94,12 @@ export function CompanyTable({ filters }: CompanyTableProps) {
         return "bg-orange-500/20 text-orange-400 border-orange-500/30"
       case "Not Shortlisted":
         return "bg-red-300/20 text-orange-400 border-orange-500/30"
-      case "Pre Placement Talk":
+      case "PPT":
         return "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
       case "OA":
         return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30"
       case "OA not clear":
-        return "bg-yellow-600/20 text-cyan-400 border-cyan-500/30"
-      case "Aptitude round":
-        return "bg-teal-500/20 text-teal-400 border-teal-500/30"
+        return "bg-red-200/20 text-red-400 border-red-500/30"
       case "GD":
         return "bg-pink-500/20 text-pink-400 border-pink-500/30"
       case "Technical round":

@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import toast from "react-hot-toast"
 import { useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
+import { DRIVE_TYPE_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS } from "@/lib/constants"
 
 interface AddCompanyModalProps {
   isOpen: boolean
@@ -168,12 +169,11 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700">
-                  <SelectItem value="On-Campus" className="text-white hover:bg-gray-700">
-                    On-Campus
-                  </SelectItem>
-                  <SelectItem value="Off-Campus" className="text-white hover:bg-gray-700">
-                    Off-Campus
-                  </SelectItem>
+                  {DRIVE_TYPE_OPTIONS.map((type) => (
+                    <SelectItem key={type} value={type} className="text-white hover:bg-gray-700">
+                      {type}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -252,21 +252,11 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                   <SelectValue placeholder="Intern + FTE" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700">
-                  <SelectItem value="Intern" className="text-white hover:bg-gray-700">
-                    Intern
-                  </SelectItem>
-                  <SelectItem value="Intern + FTE" className="text-white hover:bg-gray-700">
-                    Intern + FTE
-                  </SelectItem>
-                  <SelectItem value="Intern + PPO" className="text-white hover:bg-gray-700">
-                    Intern + PPO
-                  </SelectItem>
-                  <SelectItem value="FTE" className="text-white hover:bg-gray-700">
-                    FTE
-                  </SelectItem>
-                  <SelectItem value="Hackathon" className="text-white hover:bg-gray-700">
-                    Hackathon
-                  </SelectItem>
+                  {TYPE_OPTIONS.map((type) => (
+                    <SelectItem key={type} value={type} className="text-white hover:bg-gray-700">
+                      {type}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -279,18 +269,11 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#7886C7] border-gray-700">
-                  <SelectItem value="Not Applied" className="text-black hover:bg-gray-700">Not Applied</SelectItem>
-                  <SelectItem value="Applied" className="text-black hover:bg-gray-700">Applied</SelectItem>
-                  <SelectItem value="Shortlisted" className="text-black hover:bg-gray-700">Shortlisted</SelectItem>
-                  <SelectItem value="Not Shortlisted" className="text-black hover:bg-gray-700">Not Shortlisted</SelectItem>
-                  <SelectItem value="Pre Placement Talk" className="text-black hover:bg-gray-700">Pre Placement Talk</SelectItem>
-                  <SelectItem value="OA" className="text-black hover:bg-gray-700">OA</SelectItem>
-                  <SelectItem value="OA not clear" className="text-black hover:bg-gray-700">OA not clear</SelectItem>
-                  <SelectItem value="GD" className="text-black hover:bg-gray-700">GD</SelectItem>
-                  <SelectItem value="Technical round" className="text-black hover:bg-gray-700">Technical round</SelectItem>
-                  <SelectItem value="Interview" className="text-black hover:bg-gray-700">Interview</SelectItem>
-                  <SelectItem value="Offer" className="text-black hover:bg-gray-700">Offer</SelectItem>
-                  <SelectItem value="Rejected" className="text-black hover:bg-gray-700">Rejected</SelectItem>
+                  {STATUS_OPTIONS.map((status) => (
+                    <SelectItem key={status} value={status} className="text-black hover:bg-gray-700">
+                      {status}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
