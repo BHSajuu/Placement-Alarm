@@ -5,7 +5,8 @@ name: Send Follow-up Reminders
 on:
   schedule:
     - cron:  '*/15 * * * *'
-
+  workflow_dispatch:
+      
 jobs:
   send-follow-ups:
     runs-on: ubuntu-latest

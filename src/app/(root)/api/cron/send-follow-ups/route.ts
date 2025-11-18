@@ -86,11 +86,11 @@ export async function GET(_request: Request) {
         // 4. Send In-App Notification
         const message = `Reminder: Your ${status} for ${companyRole} at ${companyName} is at ${when}.`;
         // We use the internal action to bypass auth
-        await convex.action(api.notifications.triggerReminderNotification, {
-          userId,
-          message,
-          link: "/", // You could link to the company page later if you build one
-        });
+        await convex.action(api.push.sendPush, {
+            userId,
+            message,
+            link: "/",
+       });
 
         // 5. Increment reminder count
         await convex.mutation(api.statusEvents.incrementFollowUpReminderCount, { statusEventId: _id });

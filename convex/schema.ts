@@ -35,6 +35,13 @@ export default defineSchema({
             email: v.string(),
             clerkImageUrl: v.optional(v.string()), // For the original Clerk image
             profileImageStorageId: v.optional(v.id("_storage")),
+            subscription: v.optional(v.object({
+                  endpoint: v.string(),
+                  keys: v.object({
+                        p256dh: v.string(),
+                        auth: v.string(),
+            }),
+        })),
       }).index("by_user_id", ["userId"]),
 
 

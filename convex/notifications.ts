@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { action, internalMutation, mutation, query } from "./_generated/server";
-import { internal } from "./_generated/api";
+import {internalMutation, mutation, query } from "./_generated/server";
+
 
 // This is  an INTERNAL mutation, callable only from other Convex functions
 export const logNotification = internalMutation({
@@ -20,28 +20,7 @@ export const logNotification = internalMutation({
 });
 
 
-// This is the public-facing action your cron job will call
-export const triggerReminderNotification = action({
-  args: {
-    userId: v.string(),
-    message: v.string(),
-    link: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // We get the secret from Convex environment variables
-    const cronSecret = process.env.CRON_SECRET; 
-    if (!cronSecret) {
-      throw new Error("CRON_SECRET environment variable is not set in Convex.");
-    }
-    
-    // This action is what the API route will call
-    await ctx.runMutation(internal.notifications.logNotification, {
-      userId: args.userId,
-      message: args.message,
-      link: args.link,
-    });
-  },
-});
+
 
 export const getUnreadNotifications = query({
   handler: async (ctx) => {
