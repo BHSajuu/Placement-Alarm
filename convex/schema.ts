@@ -54,6 +54,7 @@ export default defineSchema({
             status: v.string(),
             eventDate: v.string(),
             notes: v.optional(v.string()),
+            followUpRemindersSent: v.optional(v.number()),
             }).index("by_companyId_userId", ["companyId", "userId"]),
 
       notifications: defineTable({

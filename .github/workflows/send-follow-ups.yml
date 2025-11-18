@@ -1,0 +1,17 @@
+
+name: Send Follow-up Reminders
+
+# Run every 15 minutes (same as your other job)
+on:
+  schedule:
+    - cron:  '*/15 * * * *'
+
+jobs:
+  send-follow-ups:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl the follow-up endpoint
+        env:
+          VERCEL_URL: ${{ secrets.VERCEL_URL }} 
+        run: |
+          curl -X GET "$VERCEL_URL/api/cron/send-follow-ups"
