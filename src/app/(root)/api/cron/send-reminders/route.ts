@@ -85,11 +85,12 @@ export async function GET(_request: Request) {
         await convex.mutation(api.companies.incrementReminderCount, { id: _id });
 
         const message = `Your application for ${role} at ${name} is due on ${when}.`;
-       await convex.action(api.push.sendPush, {
-        userId,
-        message,
-        link: "/",
-      });
+       await convex.mutation(api.notifications.createNotification, {
+          userId,
+          message,
+          link: "/",
+        });
+
           remindersSentCount++;
       }
     }

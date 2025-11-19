@@ -3,14 +3,12 @@
 import { useState, useRef, useEffect } from "react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
-import { Bell, X, CheckCheck, Loader2, BellRing } from "lucide-react"
+import { Bell, X, CheckCheck, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Id } from "../../../convex/_generated/dataModel"
 import { useRouter } from "next/navigation"
 import toast from "react-hot-toast"
 import { formatDate } from "@/lib/utils" 
-import { usePushSubscription } from "@/hooks/use-push-subscription"
-import { useUser } from "@clerk/nextjs"
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false)
@@ -20,9 +18,6 @@ export function NotificationBell() {
   const router = useRouter()
 
   const dropdownRef = useRef<HTMLDivElement>(null)
-  
-  const { user } = useUser();
-  const { isSupported, subscription, subscribeToPush } = usePushSubscription();
 
   const unreadCount = notifications?.length ?? 0
 
@@ -109,20 +104,6 @@ export function NotificationBell() {
               </Button>
             </div>
           </div>
-          
-          {isSupported && !subscription && (
-              <div className="px-4 pb-3">
-                <Button 
-                  onClick={() => user?.id && subscribeToPush(user.id)}
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20 hover:text-blue-200"
-                >
-                  <BellRing className="h-4 w-4 mr-2" />
-                  Enable Desktop Notifications
-                </Button>
-              </div>
-            )}
 
           <div className="max-h-96 overflow-y-auto">
             {notifications === undefined ? (

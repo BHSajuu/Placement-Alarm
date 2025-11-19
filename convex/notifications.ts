@@ -2,8 +2,7 @@ import { v } from "convex/values";
 import {internalMutation, mutation, query } from "./_generated/server";
 
 
-// This is  an INTERNAL mutation, callable only from other Convex functions
-export const logNotification = internalMutation({
+export const createNotification = mutation({
   args: {
     userId: v.string(),
     message: v.string(),
@@ -18,7 +17,6 @@ export const logNotification = internalMutation({
     });
   },
 });
-
 
 
 
