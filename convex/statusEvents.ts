@@ -1,5 +1,5 @@
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { internalMutation, mutation, query } from "./_generated/server"
 
 // This list includes statuses that imply a scheduled event
 const FOLLOW_UP_STATUSES = [
@@ -123,6 +123,19 @@ export const incrementFollowUpReminderCount = mutation({
     
     await ctx.db.patch(args.statusEventId, {
       followUpRemindersSent: (event.followUpRemindersSent || 0) + 1,
+    });
+  },
+});
+
+// Internal mutation to save Google Calendar ID for status events
+export const setEventGoogleId = internalMutation({
+  args: {
+    statusEventId: v.id("statusEvents"),
+    googleEventId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.statusEventId, {
+      googleEventId: args.googleEventId,
     });
   },
 });

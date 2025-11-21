@@ -20,6 +20,7 @@ export default defineSchema({
             userId: v.string(),
             remindersSent: v.optional(v.number()),
             lastReminderAt: v.optional(v.string()),
+            googleEventId: v.optional(v.string()),
       }).index("by_user_id", ["userId"])
         .index("by_deadline", ["deadline"])
         .searchIndex("by_name", {
@@ -55,6 +56,7 @@ export default defineSchema({
             eventDate: v.string(),
             notes: v.optional(v.string()),
             followUpRemindersSent: v.optional(v.number()),
+            googleEventId: v.optional(v.string()),
             }).index("by_companyId_userId", ["companyId", "userId"]),
 
       notifications: defineTable({

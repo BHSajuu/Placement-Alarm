@@ -1,8 +1,22 @@
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { internalMutation, mutation, query } from "./_generated/server"
 import { paginationOptsValidator } from "convex/server"
+import { api } from "./_generated/api";
 
 
+// Internal mutation to save the Google Event ID for deadlines
+export const setDeadlineGoogleEventId = internalMutation({
+  args:{
+      companyId: v.id("companies"),
+      googleEventId: v.string(),
+  },
+  handler: async (ctx , args)=>{
+     await ctx.db.patch(args.companyId, {
+      googleEventId: args.googleEventId,
+    });
+  }
+})
+ 
 export const addCompany = mutation({
       args: {
             name: v.string(),
@@ -14,26 +28,36 @@ export const addCompany = mutation({
             link: v.optional(v.string()),
             status: v.optional(v.string()),
       },
-      handler: async (ctx, args) => {
+     handler: async (ctx, args) => {
             const Identify = await ctx.auth.getUserIdentity();
             if (!Identify) {
                   throw new Error("Unauthorized");
             }
-            const user = ctx.db
-                  .query("users")
-                  .withIndex("by_user_id")
-                  .filter(q => q.eq(q.field("userId"), Identify.subject))
-                  .first();
-            if (!user) {
-                  throw new Error("User not found");
-            }
-            return await ctx.db.insert("companies", {
+            
+            const userId = Identify.subject;
+            
+            // Insert the company
+            const companyId = await ctx.db.insert("companies", {
                   ...args,
                   driveType: args.driveType,
-                  userId: Identify.subject,
+                  userId: userId,
                   remindersSent: 0,
                   lastReminderAt: "",
-            })
+            });
+
+            // TRIGGER CALENDAR SYNC
+            // If a deadline exists, schedule the action to create a Google Calendar event
+            if (args.deadline) {
+              await ctx.scheduler.runAfter(0, api.calendar.createDeadlineEvent, {
+                companyId,
+                companyName: args.name,
+                role: args.role,
+                deadline: args.deadline,
+                userId: userId,
+              });
+            }
+            
+            return companyId;
       }
 })
 
@@ -107,6 +131,9 @@ export const updateCompanyDetails = mutation({
             if (!user) {
                   throw new Error("User not found");
             }
+            // Get company name for the calendar event
+            const company = await ctx.db.get(args.companyId);
+            if (!company) throw new Error("Company not found");
 
             // Patch the main company record with the latest status
             await ctx.db
@@ -119,13 +146,24 @@ export const updateCompanyDetails = mutation({
               
               const eventDate = args.statusDateTime || new Date().toISOString();
 
-              await ctx.db.insert("statusEvents", {
+             const statusEventId = await ctx.db.insert("statusEvents", {
                 companyId: args.companyId,
                 userId: userId,
                 status: args.status,
                 eventDate: eventDate,       
                 notes: args.notes,         
               });
+              // TRIGGER CALENDAR SYNC
+              // Only sync if specific date provided and it's a significant status
+              if(args.statusDateTime){
+                await ctx.scheduler.runAfter(0, api.calendar.createStatusEvent,{
+                  statusEventId,
+                  companyName: company.name,
+                  title: args.status,
+                  date: args.statusDateTime,
+                  userId: userId,
+                });
+              }
             }
             return {success: true};
       },
