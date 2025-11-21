@@ -98,11 +98,10 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
         hour24 = 0
       }
       
-      //  Create a date object from local time components and convert to UTC ISO string
-      const dateParts = deadlineDate.split("-").map(part => parseInt(part, 10));
-      const localDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], hour24, parseInt(timeMinute));
+      const timeString = `${hour24.toString().padStart(2, '0')}:${timeMinute.padStart(2, '0')}:00`;
+      const localIsoString = `${deadlineDate}T${timeString}`;
       
-      setFormData((prev) => ({ ...prev, deadline: localDate.toISOString() }))
+      setFormData((prev) => ({ ...prev, deadline: localIsoString }));
     }
   }
   // Update deadline when date or time changes

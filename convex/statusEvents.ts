@@ -2,7 +2,7 @@ import { v } from "convex/values"
 import { internalMutation, mutation, query } from "./_generated/server"
 
 // This list includes statuses that imply a scheduled event
-const FOLLOW_UP_STATUSES = [
+export const FOLLOW_UP_STATUSES = [
   "PPT",
   "OA",
   "GD",

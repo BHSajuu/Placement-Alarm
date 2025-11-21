@@ -59,7 +59,7 @@ export const createDeadlineEvent = action({
             summary: `Deadline: ${args.role} @ ${args.companyName}`,
             description: `Application deadline for ${args.role} at ${args.companyName}. Managed by Placement Alarm.`,
             start: {
-            dateTime: args.deadline,
+            dateTime: new Date(args.deadline).toISOString(),
             },
             end: {
             // Set event to last 1 hour by default
@@ -102,7 +102,7 @@ export const createStatusEvent = action({
       summary: `${args.title}: ${args.companyName}`,
       description: `Scheduled ${args.title} for ${args.companyName}.`,
       start: {
-        dateTime: args.date,
+        dateTime: new Date(args.date).toISOString(),
       },
       end: {
         dateTime: new Date(new Date(args.date).getTime() + 60 * 60 * 1000).toISOString(),
@@ -123,6 +123,29 @@ export const createStatusEvent = action({
       }
     } catch (error) {
       console.error("Error creating status event:", error);
+    }
+  },
+});
+
+// ACTION: Delete an event from Google Calendar
+export const deleteEvent = action({
+  args: {
+    googleEventId: v.string(),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const calendar = await getGoogleCalendarClient(args.userId);
+    if (!calendar) return;
+
+    try {
+      await calendar.events.delete({
+        calendarId: "primary",
+        eventId: args.googleEventId,
+      });
+      console.log(`Deleted Google Calendar event: ${args.googleEventId}`);
+    } catch (error) {
+      // It's possible the user already deleted it manually, so we just log it.
+      console.error("Error deleting Google Calendar event:", error);
     }
   },
 });

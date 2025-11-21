@@ -2,6 +2,7 @@ import { v } from "convex/values"
 import { internalMutation, mutation, query } from "./_generated/server"
 import { paginationOptsValidator } from "convex/server"
 import { api } from "./_generated/api";
+import { FOLLOW_UP_STATUSES } from "./statusEvents";
 
 
 // Internal mutation to save the Google Event ID for deadlines
@@ -161,13 +162,44 @@ export const updateCompanyDetails = mutation({
             // Get company name for the calendar event
             const company = await ctx.db.get(args.companyId);
             if (!company) throw new Error("Company not found");
-
-            // Patch the main company record with the latest status
-            await ctx.db
-                  .patch(args.companyId, {
-                        status: args.status,
-                  });
             
+            // 1. CLEANUP: Delete Calendar Events for the OLD Status
+            // A. Check for Deadline Event 
+              if (args.status && args.status !== "Not Applied" && company.googleEventId) {
+                await ctx.scheduler.runAfter(0, api.calendar.deleteEvent, {
+                  googleEventId: company.googleEventId,
+                  userId: userId,
+                });
+                await ctx.db.patch(args.companyId, { googleEventId: undefined });
+              }
+
+            // B. Check for Previous Status Event 
+            // Find the most recent status event that has a Google Calendar ID
+            const previousStatusEvent = await ctx.db
+              .query("statusEvents")
+              .withIndex("by_companyId_userId", (q) => 
+                q.eq("companyId", args.companyId).eq("userId", userId)
+              )
+              // Filter manually for ones that have a googleEventId
+              .filter(q => q.neq(q.field("googleEventId"), undefined))
+              .order("desc") // Get the latest one
+              .first();
+
+            if (previousStatusEvent && previousStatusEvent.googleEventId) {
+              await ctx.scheduler.runAfter(0, api.calendar.deleteEvent, {
+                googleEventId: previousStatusEvent.googleEventId,
+                userId: userId,
+              });
+              // Clear the ID so we don't try to delete it again later
+              await ctx.db.patch(previousStatusEvent._id, { googleEventId: undefined });
+            }
+
+
+           // 2. UPDATE: Save the new status to the database
+            await ctx.db.patch(args.companyId, {
+              status: args.status,
+            });
+                    
 
             if (args.status) {
               
@@ -180,10 +212,13 @@ export const updateCompanyDetails = mutation({
                 eventDate: eventDate,       
                 notes: args.notes,         
               });
-              // TRIGGER CALENDAR SYNC
-              // Only sync if specific date provided and it's a significant status
-              if(args.statusDateTime){
-                await ctx.scheduler.runAfter(0, api.calendar.createStatusEvent,{
+
+              // 3. CREATE: Add new Calendar Event
+              // Only create a calendar event if:
+              // 1. A specific date/time was provided
+              // 2. The status is "Meaningful" (in our FOLLOW_UP_STATUSES list)
+              if (args.statusDateTime && FOLLOW_UP_STATUSES.includes(args.status)) {
+                await ctx.scheduler.runAfter(0, api.calendar.createStatusEvent, {
                   statusEventId,
                   companyName: company.name,
                   title: args.status,
@@ -192,9 +227,9 @@ export const updateCompanyDetails = mutation({
                 });
               }
             }
-            return {success: true};
-      },
-})
+            return { success: true };
+          },
+});
 
 
 export const getApplicationsForReminder = query({

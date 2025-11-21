@@ -23,3 +23,6 @@ A platform to help students track and manage their placement process effectively
 * **Deployment:** Vercel
 
 
+## Bugs
+1. deadline time zone didn't match in google calendar.
+2. after deleting a company its event are not deleting from the google calendar
