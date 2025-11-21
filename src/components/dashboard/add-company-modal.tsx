@@ -98,17 +98,23 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
         hour24 = 0
       }
       
-      const timeString = `${hour24.toString().padStart(2, '0')}:${timeMinute.padStart(2, '0')}:00`;
-      const localIsoString = `${deadlineDate}T${timeString}`;
+      // Construct the string manually: YYYY-MM-DDTHH:mm
+      const time24 = `${hour24.toString().padStart(2, '0')}:${timeMinute.padStart(2, '0')}`;
+      const combinedDateTime = `${deadlineDate}T${time24}`;
       
-      setFormData((prev) => ({ ...prev, deadline: localIsoString }));
+      setFormData((prev) => ({ ...prev, deadline: combinedDateTime }));
+    } else {
+      // If incomplete, clear the deadline in formData so validation fails if submitted
+      setFormData((prev) => ({ ...prev, deadline: "" }));
     }
   }
+
   // Update deadline when date or time changes
   useEffect(() => {
     updateDeadline()
   }, [deadlineDate, timeHour, timeMinute, timeAmPm])
 
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] bg-gray-950 border-gray-700 text-white shadow-2xl shadow-blue-300/30">

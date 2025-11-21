@@ -79,6 +79,12 @@ export const deleteCompany = mutation({
             if (!user) {
                   throw new Error("User not found");
             }
+            
+            // Get company first to access googleEventId
+            const company = await ctx.db.get(args.companyId);
+            if (!company) {
+                  return;
+            }
 
             // 1. Delete all Status Events associated with this company
             const statusEvents = await ctx.db
@@ -89,6 +95,13 @@ export const deleteCompany = mutation({
               .collect();
 
             for (const event of statusEvents) {
+              // Delete status event from Google Calendar if it exists
+              if (event.googleEventId) {
+                  await ctx.scheduler.runAfter(0, api.calendar.deleteEvent, {
+                        googleEventId: event.googleEventId,
+                        userId: Identify.subject,
+                  });
+              }
               await ctx.db.delete(event._id);
             }
 
@@ -104,8 +117,16 @@ export const deleteCompany = mutation({
             // Delete the document record
             await ctx.db.delete(doc._id);
           }
+          
+          // 3. Delete Company Deadline from Google Calendar
+          if (company.googleEventId) {
+              await ctx.scheduler.runAfter(0, api.calendar.deleteEvent, {
+                  googleEventId: company.googleEventId,
+                  userId: Identify.subject,
+              });
+          }
 
-          // 3. Finally, delete the Company
+          // 4. Finally, delete the Company
           return await ctx.db.delete(args.companyId);
         }
 });
