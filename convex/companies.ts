@@ -78,9 +78,36 @@ export const deleteCompany = mutation({
             if (!user) {
                   throw new Error("User not found");
             }
-            return await ctx.db.delete(args.companyId);
-      }
-})
+
+            // 1. Delete all Status Events associated with this company
+            const statusEvents = await ctx.db
+              .query("statusEvents")
+              .withIndex("by_companyId_userId", (q) => 
+                q.eq("companyId", args.companyId).eq("userId", Identify.subject)
+              )
+              .collect();
+
+            for (const event of statusEvents) {
+              await ctx.db.delete(event._id);
+            }
+
+            // 2. Delete all Documents associated with this company
+          const documents = await ctx.db
+            .query("documents")
+            .withIndex("by_companyId", (q) => q.eq("companyId", args.companyId))
+            .collect();
+
+          for (const doc of documents) {
+            // Delete the file from storage
+            await ctx.storage.delete(doc.storageId);
+            // Delete the document record
+            await ctx.db.delete(doc._id);
+          }
+
+          // 3. Finally, delete the Company
+          return await ctx.db.delete(args.companyId);
+        }
+});
 
 export const getAllCompanies = query({
       args: {

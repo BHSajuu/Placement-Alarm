@@ -99,6 +99,13 @@ export const getEventsForFollowUp = query({
     const eventsWithCompanyData = await Promise.all(
       filteredEvents.map(async (event) => {
         const company = await ctx.db.get(event.companyId);
+        
+        // If company doesn't exist, return null so we can filter it out later
+        if (!company) return null;
+
+        // If the event says "PPT" but the company current status is "Not Shortlisted", ignore this event.
+        if (company.status !== event.status) return null;
+        
         return {
           ...event,
           companyName: company?.name || "a company",
@@ -106,8 +113,9 @@ export const getEventsForFollowUp = query({
         };
       })
     );
-      
-    return eventsWithCompanyData;
+     
+    // Filter out the nulls (invalid events)
+    return eventsWithCompanyData.filter((event)=> event !== null);
   },
 });
 
