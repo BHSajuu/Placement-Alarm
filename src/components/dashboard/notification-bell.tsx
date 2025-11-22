@@ -148,10 +148,12 @@ export function NotificationBell() {
                     <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-r from-yellow-500/20 to-yellow-500/20 flex items-center justify-center border border-gray-700/50">
                       <Bell className="w-4 h-4 text-yellow-300" />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-200 leading-snug">
+                    <div className="flex flex-col">
+                      <div className="flex-1">
+                      <p className="text-sm text-gray-200 leading-snug whitespace-pre-line break-words">
                         {notification.message}
                       </p>
+
                       <p className="text-xs text-gray-400 mt-1.5">
                         {formatDate(notification._creationTime)}
                       </p>
@@ -162,12 +164,13 @@ export function NotificationBell() {
                       <Button
                         size="sm"
                         onClick={(e) => handleInsert(e, notification)}
-                        className="ml-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/50 h-8"
+                        className="ml-2 mt-6 w-44 rounded-3xl bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/50 h-8"
                       >
                         <PlusCircle className="w-4 h-4 mr-1" />
                         Insert into table
                       </Button>
                     )}
+                    </div>
                   </div>
                 ))}
               </div>
