@@ -17,6 +17,7 @@ import type * as calendar from "../calendar.js";
 import type * as companies from "../companies.js";
 import type * as documents from "../documents.js";
 import type * as drive from "../drive.js";
+import type * as gmail from "../gmail.js";
 import type * as http from "../http.js";
 import type * as notifications from "../notifications.js";
 import type * as profiles from "../profiles.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   companies: typeof companies;
   documents: typeof documents;
   drive: typeof drive;
+  gmail: typeof gmail;
   http: typeof http;
   notifications: typeof notifications;
   profiles: typeof profiles;

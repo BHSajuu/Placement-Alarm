@@ -21,6 +21,7 @@ export default defineSchema({
             remindersSent: v.optional(v.number()),
             lastReminderAt: v.optional(v.string()),
             googleEventId: v.optional(v.string()),
+            sourceEmailId: v.optional(v.string()),
       }).index("by_user_id", ["userId"])
         .index("by_deadline", ["deadline"])
         .searchIndex("by_name", {
@@ -64,6 +65,9 @@ export default defineSchema({
             message: v.string(),
             link: v.string(), 
             read: v.boolean(),
+            type: v.optional(v.string()), // e.g., "company_proposal"
+            companyData: v.optional(v.string()), // JSON stringified data
+            emailId: v.optional(v.string()), // To mark email as handled
             }).index("by_userId_read", ["userId", "read"]),
 
 });

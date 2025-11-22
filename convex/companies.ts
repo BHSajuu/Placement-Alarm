@@ -385,3 +385,34 @@ export const getPaginatedCompanies = query({
     return await query.order("desc").paginate(args.paginationOpts);
   },
 });
+
+export const addCompanyFromProposal = mutation({
+  args: {
+    notificationId: v.id("notifications"),
+    companyData: v.any(), 
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    if(!args.companyData || !args.companyData.name || !args.companyData.role ){
+      throw new Error("Invalid company data");
+    }
+
+    await ctx.db.insert("companies", {
+      userId: identity.subject,
+      name: args.companyData.name || "Unknown",
+      role: args.companyData.role || "Unknown",
+      package: args.companyData.package || "TBD",
+      driveType: args.companyData.driveType || "On-Campus",
+      deadline: args.companyData.deadline || undefined,
+      type: args.companyData.type || "FTE",
+      link: args.companyData.link || "",
+      status: "Not Applied",
+      remindersSent: 0,
+    });
+
+    // Mark notification as read (or delete it)
+    await ctx.db.patch(args.notificationId, { read: true });
+  },
+});

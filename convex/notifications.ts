@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import {internalMutation, mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 
 
 export const createNotification = mutation({
@@ -88,5 +88,35 @@ export const markAllAsRead = mutation({
         return ctx.db.patch(notification._id, { read: true });
       })
     );
+  },
+});
+
+
+export const createProposalNotification = internalMutation({
+  args: {
+    userId: v.string(),
+    message: v.string(),
+    companyData: v.string(),
+    emailId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Check if we already processed this email (optional dedup check)
+    const existing = await ctx.db
+        .query("notifications")
+        .withIndex("by_userId_read", q => q.eq("userId", args.userId))
+        .filter(q => q.eq(q.field("emailId"), args.emailId))
+        .first();
+    
+    if (existing) return;
+
+    await ctx.db.insert("notifications", {
+      userId: args.userId,
+      message: args.message,
+      link: "#", // No link yet
+      read: false,
+      type: "company_proposal",
+      companyData: args.companyData,
+      emailId: args.emailId,
+    });
   },
 });

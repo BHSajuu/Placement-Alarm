@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
-import { Bell, X, CheckCheck, Loader2 } from "lucide-react"
+import { Bell, X, CheckCheck, Loader2, PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Id } from "../../../convex/_generated/dataModel"
 import { useRouter } from "next/navigation"
@@ -20,6 +20,8 @@ export function NotificationBell() {
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   const unreadCount = notifications?.length ?? 0
+  
+  const acceptProposal = useMutation(api.companies.addCompanyFromProposal);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -59,6 +61,26 @@ export function NotificationBell() {
     }
   }
 
+  const handleInsert = async (e: React.MouseEvent, notification: any) => {
+    e.stopPropagation(); 
+    const toastId = toast.loading("Adding company...");
+    
+    try {
+      const data = JSON.parse(notification.companyData);
+      
+      // Call a specific mutation that adds company AND deletes/marks notification
+      await acceptProposal({
+        notificationId: notification._id,
+        companyData: data
+      });
+      
+      toast.success("Company added successfully!", { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add company", { id: toastId });
+    }
+};
+   
   return (
     <div className="relative" ref={dropdownRef}>
      <Button
@@ -134,6 +156,18 @@ export function NotificationBell() {
                         {formatDate(notification._creationTime)}
                       </p>
                     </div>
+
+                    {/* Insert Button for Proposals */}
+                    {notification.type === "company_proposal" && (
+                      <Button
+                        size="sm"
+                        onClick={(e) => handleInsert(e, notification)}
+                        className="ml-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/50 h-8"
+                      >
+                        <PlusCircle className="w-4 h-4 mr-1" />
+                        Insert into table
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
