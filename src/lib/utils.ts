@@ -5,12 +5,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-
 export function formatDate(date: string | Date | number) {
+  // 1. Handle null/undefined gracefully
+  if (!date) return "N/A";
+
   const dateObj = new Date(date);
-  
+
+  // 2. Check if the date is valid. If not, return the original string (e.g., "Not mentioned")
+  if (isNaN(dateObj.getTime())) {
+    return date.toString();
+  }
+
   // Check if the date string includes time information
- const hasTime = (typeof date === 'string' && (date.includes('T') || date.includes(':'))) || typeof date === 'number';
+  const hasTime = (typeof date === 'string' && (date.includes('T') || date.includes(':'))) || typeof date === 'number';
 
   if (hasTime) {
     return new Intl.DateTimeFormat("en-US", {
@@ -22,14 +29,13 @@ export function formatDate(date: string | Date | number) {
       hour12: true
     }).format(dateObj);
   }
-  
+
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
   }).format(dateObj);
 }
-
 
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) return '0 Bytes';
@@ -39,4 +45,3 @@ export function formatBytes(bytes: number, decimals = 2): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
-

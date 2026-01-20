@@ -13,15 +13,15 @@ export async function parseCompanyEmail(subject: string, body: string) {
   console.log(`Initializing Gemini with Key: ${apiKey.substring(0, 4)}...`);
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  
-  const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash-001",
-        generationConfig: {
-          temperature: 0.1,
-          topP: 0.9,
-        },
-      });
-  
+
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-3-flash-preview",
+    generationConfig: {
+      temperature: 0.1,
+      topP: 0.9,
+    },
+  });
+
   const currentYear = new Date().getFullYear();
 
   const prompt = `
@@ -65,10 +65,10 @@ export async function parseCompanyEmail(subject: string, body: string) {
     const result = await model.generateContent(prompt);
     const response = result.response;
     const text = response.text();
-    
+
     // Clean up markdown code blocks if Gemini adds them
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    
+
     if (!jsonMatch) {
       console.error("Gemini did not return a valid JSON object. Raw text:", text);
       return null;

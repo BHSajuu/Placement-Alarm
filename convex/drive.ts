@@ -43,30 +43,66 @@ export const saveGoogleDriveFile = action({
     const drive = await getGoogleDriveClient(userId);
     if (!drive) throw new Error("Could not authenticate with Google Drive");
 
-    // 1. Check file size (Add supportsAllDrives to fix 404 on some files)
+    // 1. Get Metadata to check type and size
     const meta = await drive.files.get({
       fileId: args.fileId,
-      fields: "size, mimeType",
-      supportsAllDrives: true, // <--- ADD THIS
+      fields: "size, mimeType, name",
+      supportsAllDrives: true,
     });
 
-    const fileSize = parseInt(meta.data.size || "0");
-    
-    if (fileSize > MAX_FILE_SIZE_BYTES) {
+    const isGoogleDoc = meta.data.mimeType?.startsWith("application/vnd.google-apps");
+    let fileSize = parseInt(meta.data.size || "0");
+
+    // Google Docs don't have a 'size' until exported, so we skip size check for them initially
+    if (!isGoogleDoc && fileSize > MAX_FILE_SIZE_BYTES) {
       throw new Error(`File too large (Max 10MB). Selected file is ${(fileSize / 1024 / 1024).toFixed(2)}MB`);
     }
 
-    // 2. Download the file content
-    const res = await drive.files.get(
-      { 
-        fileId: args.fileId, 
-        alt: "media"
-      },
-      { responseType: "arraybuffer" }
-    );
+    let fileBuffer: ArrayBuffer;
+    let finalMimeType = args.mimeType;
+    let finalFileName = args.fileName;
 
-    const fileBuffer = res.data as ArrayBuffer;
-    const blob = new Blob([fileBuffer], { type: args.mimeType });
+    // 2. Download or Export based on file type
+    if (isGoogleDoc) {
+      // Logic: Export Google Docs to Microsoft Word/PDF format
+      let exportMimeType = "application/pdf"; // Default fallback
+      
+      if (meta.data.mimeType === "application/vnd.google-apps.document") {
+        exportMimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"; // .docx
+        if (!finalFileName.endsWith(".docx")) finalFileName += ".docx";
+        finalMimeType = exportMimeType;
+      } else if (meta.data.mimeType === "application/vnd.google-apps.spreadsheet") {
+        exportMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; // .xlsx
+        if (!finalFileName.endsWith(".xlsx")) finalFileName += ".xlsx";
+        finalMimeType = exportMimeType;
+      } else if (meta.data.mimeType === "application/vnd.google-apps.presentation") {
+        exportMimeType = "application/vnd.openxmlformats-officedocument.presentationml.presentation"; // .pptx
+        if (!finalFileName.endsWith(".pptx")) finalFileName += ".pptx";
+        finalMimeType = exportMimeType;
+      }
+
+      // Use .export() for Google Docs
+      const res = await drive.files.export(
+        { fileId: args.fileId, mimeType: exportMimeType },
+        { responseType: "arraybuffer" }
+      );
+      fileBuffer = res.data as ArrayBuffer;
+
+    } else {
+      // Standard binary download (e.g., uploaded PDF, JPG, real .docx)
+      const res = await drive.files.get(
+        { fileId: args.fileId, alt: "media" },
+        { responseType: "arraybuffer" }
+      );
+      fileBuffer = res.data as ArrayBuffer;
+    }
+
+    // Double check size after export/download
+    if (fileBuffer.byteLength > MAX_FILE_SIZE_BYTES) {
+        throw new Error(`File too large (Max 10MB).`);
+    }
+
+    const blob = new Blob([fileBuffer], { type: finalMimeType });
 
     // 3. Store in Convex
     const storageId = await ctx.storage.store(blob);
@@ -75,9 +111,9 @@ export const saveGoogleDriveFile = action({
     await ctx.runMutation(internal.documents.createDocumentRecord, {
       userId,
       storageId,
-      documentName: args.fileName,
-      fileType: args.mimeType,
-      fileSize: fileSize,
+      documentName: finalFileName,
+      fileType: finalMimeType,
+      fileSize: fileBuffer.byteLength,
       companyId: args.companyId,
     });
 
