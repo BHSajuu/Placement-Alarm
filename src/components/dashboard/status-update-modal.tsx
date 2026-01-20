@@ -52,33 +52,37 @@ export function StatusUpdateModal({
 
   const updateCompanyDetails = useMutation(api.companies.updateCompanyDetails);
 
-  
-  const updateStatusDateTime = () => {
-    if (statusDate && timeHour && timeMinute) {
-      // Case 1: User provided full date and time
-      let hour24 = parseInt(timeHour);
-      if (timeAmPm === "PM" && hour24 !== 12) {
-        hour24 += 12;
-      } else if (timeAmPm === "AM" && hour24 === 12) {
-        hour24 = 0;
+
+  useEffect(() => {
+    const updateStatusDateTime = () => {
+      if (statusDate && timeHour && timeMinute) {
+        // Case 1: User provided full date and time
+        let hour24 = parseInt(timeHour);
+        if (timeAmPm === "PM" && hour24 !== 12) {
+          hour24 += 12;
+        } else if (timeAmPm === "AM" && hour24 === 12) {
+          hour24 = 0;
+        }
+
+        const time24 = `${hour24.toString().padStart(2, '0')}:${timeMinute.padStart(2, '0')}`;
+        const combinedDateTime = `${statusDate}T${time24}`;
+        setStatusDateTime(combinedDateTime);
+      } else if (statusDate) {
+        // Case 2: User provided ONLY date, so default to current time
+        const now = new Date();
+        const currentHour = now.getHours().toString().padStart(2, '0');
+        const currentMinute = now.getMinutes().toString().padStart(2, '0');
+
+        const combinedDateTime = `${statusDate}T${currentHour}:${currentMinute}`;
+        setStatusDateTime(combinedDateTime);
+      } else {
+        // Case 3: No date provided, clear the datetime
+        setStatusDateTime("");
       }
-      
-      const time24 = `${hour24.toString().padStart(2, '0')}:${timeMinute.padStart(2, '0')}`;
-      const combinedDateTime = `${statusDate}T${time24}`;
-      setStatusDateTime(combinedDateTime);
-    } else if (statusDate) {
-      // Case 2: User provided ONLY date, so default to current time
-      const now = new Date();
-      const currentHour = now.getHours().toString().padStart(2, '0');
-      const currentMinute = now.getMinutes().toString().padStart(2, '0');
-      
-      const combinedDateTime = `${statusDate}T${currentHour}:${currentMinute}`;
-      setStatusDateTime(combinedDateTime);
-    } else {
-      // Case 3: No date provided, clear the datetime
-      setStatusDateTime("");
-    }
-  };
+    };
+
+    updateStatusDateTime();
+  }, [statusDate, timeHour, timeMinute, timeAmPm]);
   useEffect(() => {
     if (company) {
       setStatus(company.status);
@@ -91,23 +95,20 @@ export function StatusUpdateModal({
     }
   }, [company]);
 
-  useEffect(() => {
-    updateStatusDateTime();
-  }, [statusDate, timeHour, timeMinute, timeAmPm]);
 
   const handleUpdate = async () => {
     if (!companyId) return;
 
     setIsLoading(true);
     try {
-  
+
       await updateCompanyDetails({
         companyId,
         status: status,
-        statusDateTime: statusDateTime, 
-        notes: note,                    
+        statusDateTime: statusDateTime,
+        notes: note,
       });
-      
+
       toast.success("Status updated successfully");
       onClose();
 
@@ -131,23 +132,23 @@ export function StatusUpdateModal({
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="status" className="text-gray-300">
-            Status
-          </Label>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="bg-gray-900 border-gray-600 text-white">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#7886C7] border-gray-700">
-              {STATUS_OPTIONS.map((s) => (
-                <SelectItem key={s} value={s} className="text-black ">
-                  {s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              Status
+            </Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="bg-gray-900 border-gray-600 text-white">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#7886C7] border-gray-700">
+                {STATUS_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s} className="text-black ">
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="statusDateTime" className="text-gray-300">
               Status Date & Time (Optional)
@@ -197,7 +198,7 @@ export function StatusUpdateModal({
               </div>
             </div>
           </div>
-          
+
           <div className="flex flex-col md:mr-4">
             <Label htmlFor="company-note" className="mb-1 text-gray-300">
               Add a Note (optional)

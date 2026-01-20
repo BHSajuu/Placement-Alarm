@@ -87,30 +87,30 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-// Helper function to combine date and time
-  const updateDeadline = () => {
-    if (deadlineDate && timeHour && timeMinute) {
-      // Convert 12-hour to 24-hour format
-      let hour24 = parseInt(timeHour)
-      if (timeAmPm === "PM" && hour24 !== 12) {
-        hour24 += 12
-      } else if (timeAmPm === "AM" && hour24 === 12) {
-        hour24 = 0
-      }
-      
-      // Construct the string manually: YYYY-MM-DDTHH:mm
-      const time24 = `${hour24.toString().padStart(2, '0')}:${timeMinute.padStart(2, '0')}`;
-      const combinedDateTime = `${deadlineDate}T${time24}`;
-      
-      setFormData((prev) => ({ ...prev, deadline: combinedDateTime }));
-    } else {
-      // If incomplete, clear the deadline in formData so validation fails if submitted
-      setFormData((prev) => ({ ...prev, deadline: "" }));
-    }
-  }
-
-  // Update deadline when date or time changes
+// Update deadline when date or time changes
   useEffect(() => {
+    // Function moved inside useEffect to avoid dependency issues
+    const updateDeadline = () => {
+      if (deadlineDate && timeHour && timeMinute) {
+        // Convert 12-hour to 24-hour format
+        let hour24 = parseInt(timeHour)
+        if (timeAmPm === "PM" && hour24 !== 12) {
+          hour24 += 12
+        } else if (timeAmPm === "AM" && hour24 === 12) {
+          hour24 = 0
+        }
+        
+        // Construct the string manually: YYYY-MM-DDTHH:mm
+        const time24 = `${hour24.toString().padStart(2, '0')}:${timeMinute.padStart(2, '0')}`;
+        const combinedDateTime = `${deadlineDate}T${time24}`;
+        
+        setFormData((prev) => ({ ...prev, deadline: combinedDateTime }));
+      } else {
+        // If incomplete, clear the deadline in formData
+        setFormData((prev) => ({ ...prev, deadline: "" }));
+      }
+    }
+
     updateDeadline()
   }, [deadlineDate, timeHour, timeMinute, timeAmPm])
 
