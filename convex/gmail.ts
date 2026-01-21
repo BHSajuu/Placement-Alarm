@@ -1,7 +1,8 @@
 "use node";
 
-import { action } from "./_generated/server";
+import { action, internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { v } from "convex/values";
 import { google } from "googleapis";
 import { parseCompanyEmail } from "../src/lib/gemini";
 
@@ -25,6 +26,7 @@ async function getGmailClient(refreshToken: string) {
 
   return google.gmail({ version: "v1", auth: oauth2Client });
 }
+
 function getBody(payload: any) {
   let body = '';
   if (payload.parts) {
@@ -69,6 +71,104 @@ function normalizeTypeString(s: string): string {
   return (s || '').replace(/\s*\+\s*/g, ' + ').replace(/\s+/g, ' ').trim();
 }
 
+/**
+ * Worker Action: Syncs emails for a SINGLE user.
+ * This runs in its own context, so if it fails, it doesn't affect other users.
+ */
+export const syncUserEmail = internalAction({
+  args: {
+    userId: v.string(),
+    refreshToken: v.string(),
+    parsingEmail: v.string(),
+    userName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    console.log(`Checking emails for user ${args.userName} (Parsing Email: ${args.parsingEmail})`);
+
+    // 1. Get Client using stored Refresh Token
+    const gmail = await getGmailClient(args.refreshToken);
+    if (!gmail) return;
+
+    try {
+      // 2. Search for unread emails from the college domain
+      //  Added "newer_than:1d" to prevent processing stale emails (3-5 days old)
+      const res = await gmail.users.messages.list({
+        userId: "me",
+        q: "from:*.nits.ac.in is:unread newer_than:1d", 
+        maxResults: 5, // Process a few at a time to stay in free limits
+      });
+
+      const messages = res.data.messages;
+      if (!messages || messages.length === 0) return;
+
+      for (const msg of messages) {
+        if (!msg.id) continue;
+
+        // Fetch full email content
+        const email = await gmail.users.messages.get({
+          userId: "me",
+          id: msg.id,
+          format: "full",
+        });
+
+        const subjectHeader = email.data.payload?.headers?.find(h => h.name === "Subject");
+        const subject = subjectHeader?.value || "New Company";
+
+        // Extract Body 
+        const body = getBody(email.data.payload);
+
+        // FILTER CHECK
+        if (!isValidPlacementEmail(subject, body)) {
+          console.log(`Skipping invalid email: ${subject}`);
+          // Mark as read so we don't fetch it again endlessly
+          await gmail.users.messages.modify({
+            userId: "me",
+            id: msg.id,
+            requestBody: { removeLabelIds: ["UNREAD"] },
+          });
+          continue;
+        }
+
+        console.log(`Processing email: ${subject}`);
+
+        // AI Parse
+        const extractedData = await parseCompanyEmail(subject, body);
+
+        // Extract type from subject and normalize it
+        const extractedType = extractTypeFromSubject(subject);
+        if (extractedData) {
+          extractedData.type = normalizeTypeString(extractedType);
+        }
+
+        if (extractedData) {
+          // Create Notification Proposal
+          await ctx.runMutation(internal.notifications.createProposalNotification, {
+            userId: args.userId,
+            emailId: msg.id,
+            companyData: JSON.stringify(extractedData),
+            message: `New Opportunity detected: ${extractedData.name} \n Role: ${extractedData.role} \n CTC: ${extractedData.package} \n Eligible Branches: ${extractedData["eligible-branch"]} \n Eligibility Criteria: ${extractedData["eligibility-criteria"]}`,
+          });
+
+          // Mark email as read so we don't process it again
+          await gmail.users.messages.modify({
+            userId: "me",
+            id: msg.id,
+            requestBody: { removeLabelIds: ["UNREAD"] },
+          });
+        } else {
+          console.log("Failed to extract data from email:", subject);
+        }
+      }
+    } catch (error) {
+      console.error(`Error syncing gmail for ${args.userId}:`, error);
+    }
+  }
+});
+
+/**
+ * Dispatcher Action: Fetches all users and schedules a sync job for each.
+ * This runs quickly and avoids timeouts.
+ */
 export const checkEmailsAndSync = action({
   args: {},
   handler: async (ctx) => {
@@ -81,85 +181,13 @@ export const checkEmailsAndSync = action({
         continue; // Skip users who haven't linked a dedicated parsing account
       }
 
-      console.log(`Checking emails for user ${user.name} (Parsing Email: ${user.parsingConfig.email})`);
-
-      // 3. Get Client using stored Refresh Token
-      const gmail = await getGmailClient(user.parsingConfig.refreshToken);
-      if (!gmail) continue;
-
-      try {
-        //  Search for unread emails from the college domain
-        const res = await gmail.users.messages.list({
-          userId: "me",
-          q: "from:*.nits.ac.in is:unread newer_than:1d", // Filter by domain, unread status and recent emails
-          maxResults: 5, // Process a few at a time to stay in free limits
-        });
-
-        const messages = res.data.messages;
-        if (!messages || messages.length === 0) continue;
-
-        for (const msg of messages) {
-          if(!msg.id) continue;
-
-          // Fetch full email content
-          const email = await gmail.users.messages.get({
-            userId: "me",
-            id: msg.id,
-            format: "full",
-          });
-
-          const subjectHeader = email.data.payload?.headers?.find(h => h.name === "Subject");
-          const subject = subjectHeader?.value || "New Company";
-          
-          // Extract Body 
-           const body = getBody(email.data.payload);
-
-           // FILTER CHECK
-            if (!isValidPlacementEmail(subject, body)) {
-              console.log(`Skipping invalid email: ${subject}`);
-              // Mark as read so we don't fetch it again endlessly
-              await gmail.users.messages.modify({
-                userId: "me",
-                id: msg.id,
-                requestBody: { removeLabelIds: ["UNREAD"] },
-              });
-              continue; 
-            }
-            
-           console.log(`Processing email: ${subject}`);
-
-          // AI Parse
-          const extractedData = await parseCompanyEmail(subject, body);
-          
-          // Extract type from subject and normalize it
-          const extractedType = extractTypeFromSubject(subject);
-          if (extractedData) {
-            extractedData.type = normalizeTypeString(extractedType);
-          }
-          
-
-          if (extractedData) {
-            // Create Notification Proposal
-            await ctx.runMutation(internal.notifications.createProposalNotification, {
-              userId: user.userId,
-              emailId: msg.id,
-              companyData: JSON.stringify(extractedData),
-              message: `New Opportunity detected: ${extractedData.name} \n Role: ${extractedData.role} \n CTC: ${extractedData.package} \n Eligible Branches: ${extractedData["eligible-branch"]} \n Eligibility Criteria: ${extractedData["eligibility-criteria"]}`,
-            });
-
-            // Mark email as read so we don't process it again
-            await gmail.users.messages.modify({
-              userId: "me",
-              id: msg.id,
-              requestBody: { removeLabelIds: ["UNREAD"] },
-            });
-          }else {
-              console.log("Failed to extract data from email:", subject);
-          }
-        }
-      } catch (error) {
-        console.error(`Error syncing gmail for ${user.userId}:`, error);
-      }
+      // 3. FAN OUT: Schedule a separate job for this user
+      await ctx.scheduler.runAfter(0, internal.gmail.syncUserEmail, {
+        userId: user.userId,
+        refreshToken: user.parsingConfig.refreshToken,
+        parsingEmail: user.parsingConfig.email,
+        userName: user.name,
+      });
     }
   },
 });
