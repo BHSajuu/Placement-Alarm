@@ -41,21 +41,41 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
 
   const addCompany = useMutation(api.companies.addCompany);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    let finalDeadline = formData.deadline;
+    let finalDeadline = "";
 
-    // Check if a date is picked, but time fields are empty
-    if (deadlineDate && (!timeHour || !timeMinute)) {
-      // Create a date object from the provided date
-      const dateParts = deadlineDate.split("-").map(part => parseInt(part, 10));
-      // Set time to 23:59:59 (End of Day) in local timezone
-      const eodDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 23, 59, 59);
-      finalDeadline = eodDate.toISOString();
+    //  Always reconstruct the date to ensure UTC conversion
+    if (deadlineDate) {
+      // 1. Parse the YYYY-MM-DD input
+      const [year, month, day] = deadlineDate.split("-").map(Number);
+      
+      let hour = 0;
+      let minute = 0;
+      let second = 0;
+
+      if (timeHour && timeMinute) {
+        // Case A: User picked a specific time
+        hour = parseInt(timeHour);
+        minute = parseInt(timeMinute);
+        if (timeAmPm === "PM" && hour !== 12) hour += 12;
+        if (timeAmPm === "AM" && hour === 12) hour = 0;
+      } else {
+        // Case B: User left time empty -> End of Day (23:59:59)
+        hour = 23;
+        minute = 59;
+        second = 59;
+      }
+
+      // 2. Create a Date object (Uses your Browser's Local Timezone)
+      // Note: Month is 0-indexed in JavaScript Date
+      const localDate = new Date(year, month - 1, day, hour, minute, second);
+
+      // 3. Convert to UTC ISO String (e.g., "2025-01-22T16:30:00.000Z")
+      finalDeadline = localDate.toISOString(); 
     }
 
-    // Use the new 'finalDeadline' variable for validation
     if (!formData.name || !formData.role || !formData.package || !formData.driveType || !finalDeadline || !formData.type) {
       toast.error("Please fill in all required fields")
       return
@@ -63,20 +83,20 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
 
     setIsLoading(true)
     try {
-      
       await addCompany({
         ...formData,
         deadline: finalDeadline 
       });
 
       toast.success("Company added successfully")
-      setFormData({ name: "", role: "", package: "", driveType: "", deadline: "", link: "", type: "", status: "" })
+      setFormData({ name: "", role: "", package: "", driveType: "", deadline: "", link: "", type: "", status: "Not Applied" })
       setDeadlineDate("")
       setTimeHour("")
       setTimeMinute("")
       setTimeAmPm("AM")
       onClose()
     } catch (error) {
+      console.error(error);
       toast.error("Failed to add company")
     } finally {
       setIsLoading(false)

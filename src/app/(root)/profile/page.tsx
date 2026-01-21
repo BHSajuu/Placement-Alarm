@@ -19,7 +19,8 @@ import {
   Camera, 
   Loader, 
   Link as LinkIcon, 
-  Unlink 
+  Unlink,
+  Lock
 } from "lucide-react"
 import toast from "react-hot-toast"
 import Image from "next/image"
@@ -28,7 +29,6 @@ import { api } from "../../../../convex/_generated/api"
 import ProfileInfoCard from "@/components/profile/profile-infoCard"
 import LoadingSkeleton from "@/components/profile/loading-skeleton"
 
-// 1. Rename your main logic component to 'ProfileContent'
 function ProfileContent() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
@@ -42,10 +42,10 @@ function ProfileContent() {
 
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    email: "", // This maps to the Profile/Notification email
   })
 
-  // --- Convex Hooks ---
+  //  Convex Hooks 
   const profile = useQuery(
     api.profiles.getUserProfile,
     user?.id ? { userId: user.id } : "skip"
@@ -60,7 +60,7 @@ function ProfileContent() {
   const updateProfileImage = useMutation(api.profiles.updateProfileImage)
   const generateUploadUrl = useMutation(api.profiles.generateUploadUrl)
 
-  // --- Google OAuth Actions ---
+  //  Google OAuth Actions 
   const getGoogleAuthUrl = useAction(api.googleAuth.getAuthUrl)
   const exchangeCode = useAction(api.googleAuth.exchangeCodeAndSave)
   const disconnectParsing = useMutation(api.users.disconnectParsing)
@@ -74,7 +74,7 @@ function ProfileContent() {
     }
   }, [profile])
 
-  // --- OAuth Callback Handler ---
+  //  OAuth Callback Handler 
   useEffect(() => {
     const code = searchParams.get("code")
     
@@ -100,7 +100,7 @@ function ProfileContent() {
     }
   }, [searchParams, user, exchangeCode, router, isLinking])
 
-  // --- Handlers ---
+  //  Handlers 
   const handleLinkGoogle = async () => {
     try {
       const url = await getGoogleAuthUrl()
@@ -188,7 +188,8 @@ function ProfileContent() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  if (!isLoaded || profile === undefined) {
+  // Wait for both profile and userData to load
+  if (!isLoaded || profile === undefined || userData === undefined) {
        return <LoadingSkeleton />
   }
 
@@ -263,7 +264,7 @@ function ProfileContent() {
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-purple-200 to-pink-300 bg-clip-text text-transparent mb-2">
                   {formData.name || "User Profile"}
                 </h1>
-                <p className="text-gray-400 text-lg mb-4">{formData.email}</p>
+                <p className="text-gray-400 text-lg mb-4">{userData?.email}</p>
                 <div className="flex  md:flex-wrap justify-center md:justify-start gap-3">
                   <div className="flex items-center space-x-2 bg-gray-700/30 rounded-full p-2 md:px-4 md:py-2">
                     <Shield className="h-4 w-4 text-green-400" />
@@ -339,13 +340,30 @@ function ProfileContent() {
                 />
               </div>
 
-              {/* Email Field */}
+              {/* Authenticated Email Field (Read Only) */}
               <div className="space-y-3">
+                <Label htmlFor="auth-email" className="text-gray-300 font-medium flex items-center gap-2 text-lg">
+                  <div className="p-2 bg-gradient-to-r from-gray-500/20 to-slate-500/20 rounded-lg">
+                    <Lock className="h-4 w-4 text-gray-400" />
+                  </div>
+                  Authenticated Email
+                </Label>
+                <Input
+                  id="auth-email"
+                  value={userData?.email || ""}
+                  disabled
+                  className="h-14 bg-gray-800/50 border-gray-700/50 text-gray-400 cursor-not-allowed rounded-xl text-lg"
+                />
+                <p className="text-xs text-gray-500 ml-1">Used for login. Cannot be changed.</p>
+              </div>
+
+              {/* Notification Email Field */}
+              <div className="space-y-3 md:col-span-2">
                 <Label htmlFor="email" className="text-gray-300 font-medium flex items-center gap-2 text-lg">
                   <div className="p-2 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg">
                     <Mail className="h-4 w-4 text-green-400" />
                   </div>
-                  Email Address
+                  Notification Email
                 </Label>
                 <Input
                   id="email"
@@ -356,8 +374,9 @@ function ProfileContent() {
                   className={`h-14 bg-gray-700/30 border-gray-600/50 text-white placeholder:text-gray-400 transition-all duration-300 rounded-xl text-lg ${
                     isEditing ? "focus:border-purple-500 focus:bg-gray-700/50 focus:shadow-lg focus:shadow-purple-500/20" : "opacity-70"
                   }`}
-                  placeholder="Enter your email address"
+                  placeholder="Enter email for reminders"
                 />
+                <p className="text-xs text-gray-500 ml-1">Deadline reminders will be sent to this address.</p>
               </div>
             </div>
 
@@ -422,10 +441,8 @@ function ProfileContent() {
   )
 }
 
-// 2. Export the default component wrapped in Suspense
 export default function Profile() {
   return (
-    // We use the same LoadingSkeleton you already imported
     <Suspense fallback={<LoadingSkeleton />}>
       <ProfileContent />
     </Suspense>
