@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react" // Added useRef
+import { useState, useEffect, useRef, Suspense } from "react" 
 import { SignedIn, SignOutButton, useUser } from "@clerk/nextjs"
 import { useMutation, useQuery, useAction } from "convex/react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -28,7 +28,8 @@ import { api } from "../../../../convex/_generated/api"
 import ProfileInfoCard from "@/components/profile/profile-infoCard"
 import LoadingSkeleton from "@/components/profile/loading-skeleton"
 
-export default function Profile() {
+// 1. Rename your main logic component to 'ProfileContent'
+function ProfileContent() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -37,7 +38,6 @@ export default function Profile() {
   const [isUploading, setIsUploading] = useState(false)
   const [isLinking, setIsLinking] = useState(false)
   
-  // FIX: Ref to prevent double-execution in Strict Mode
   const processedCode = useRef<string | null>(null)
 
   const [formData, setFormData] = useState({
@@ -74,14 +74,11 @@ export default function Profile() {
     }
   }, [profile])
 
-  // --- OAuth Callback Handler (UPDATED) ---
+  // --- OAuth Callback Handler ---
   useEffect(() => {
     const code = searchParams.get("code")
     
-    // Check if code exists AND we haven't processed this specific code yet
     if (code && user?.id && !isLinking && processedCode.current !== code) {
-      
-      // Mark this code as processed immediately
       processedCode.current = code;
 
       const handleOAuth = async () => {
@@ -90,11 +87,9 @@ export default function Profile() {
         try {
           await exchangeCode({ code, userId: user.id })
           toast.success("Email parsing enabled successfully!", { id: toastId })
-          // Clean the URL
           router.replace("/profile")
         } catch (error) {
           console.error("OAuth Error:", error)
-          // If it fails, allow retry (optional, but good for debugging)
           processedCode.current = null; 
           toast.error("Failed to link account. Please try again.", { id: toastId })
         } finally {
@@ -103,10 +98,9 @@ export default function Profile() {
       }
       handleOAuth()
     }
-  }, [searchParams, user, exchangeCode, router, isLinking]) // Removed explicit dependencies causing loops
+  }, [searchParams, user, exchangeCode, router, isLinking])
 
   // --- Handlers ---
-
   const handleLinkGoogle = async () => {
     try {
       const url = await getGoogleAuthUrl()
@@ -425,5 +419,15 @@ export default function Profile() {
         </div>
       </div>
     </div>
+  )
+}
+
+// 2. Export the default component wrapped in Suspense
+export default function Profile() {
+  return (
+    // We use the same LoadingSkeleton you already imported
+    <Suspense fallback={<LoadingSkeleton />}>
+      <ProfileContent />
+    </Suspense>
   )
 }
