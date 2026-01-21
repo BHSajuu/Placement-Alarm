@@ -14,6 +14,5 @@ jobs:
       - name: Trigger Email Sync Endpoint
         env:
           VERCEL_URL: ${{ secrets.VERCEL_URL }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           curl -f -L -X GET "$VERCEL_URL/api/cron/sync-emails"

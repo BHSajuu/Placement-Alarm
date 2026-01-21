@@ -5,12 +5,7 @@ import { api } from "../../../../../../convex/_generated/api";
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: Request) {
-  // Security check for Vercel Cron
-  const authHeader = req.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
-
+ 
   try {
     await convex.action(api.gmail.checkEmailsAndSync);
     return NextResponse.json({ success: true });
