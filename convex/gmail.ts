@@ -5,28 +5,26 @@ import { internal } from "./_generated/api";
 import { google } from "googleapis";
 import { parseCompanyEmail } from "../src/lib/gemini";
 
-// Helper to get Gmail Client 
-async function getGmailClient(userId: string) {
-  const clerkSecretKey = process.env.CLERK_SECRET_KEY;
-  if (!clerkSecretKey) return null;
+//  helper to get Gmail Client using stored Refresh Token
+async function getGmailClient(refreshToken: string) {
+  if (!process.env.GOOGLE_PARSING_CLIENT_ID || !process.env.GOOGLE_PARSING_CLIENT_SECRET) {
+    console.error("Missing Google Parsing Env Vars");
+    return null;
+  }
 
-  const res = await fetch(
-    `https://api.clerk.com/v1/users/${userId}/oauth_access_tokens/oauth_google`,
-    { headers: { Authorization: `Bearer ${clerkSecretKey}` } }
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_PARSING_CLIENT_ID,
+    process.env.GOOGLE_PARSING_CLIENT_SECRET
   );
 
-  if (!res.ok) return null;
-  const data = await res.json();
-  const tokenData = data[0];
-
-  if (!tokenData?.token) return null;
-
-  const oauth2Client = new google.auth.OAuth2();
-  oauth2Client.setCredentials({ access_token: tokenData.token });
+  // Set the credentials. verifyIdToken is not needed for API calls, just access/refresh tokens.
+  // The client will automatically use the refresh_token to get a new access_token when needed.
+  oauth2Client.setCredentials({
+    refresh_token: refreshToken
+  });
 
   return google.gmail({ version: "v1", auth: oauth2Client });
 }
-
 function getBody(payload: any) {
   let body = '';
   if (payload.parts) {
@@ -74,11 +72,19 @@ function normalizeTypeString(s: string): string {
 export const checkEmailsAndSync = action({
   args: {},
   handler: async (ctx) => {
-
+    // 1. Fetch all users
     const users = await ctx.runQuery(internal.users.getAllUsersInternal);
 
     for (const user of users) {
-      const gmail = await getGmailClient(user.userId);
+      // 2. CHECK IF USER HAS PARSING ENABLED
+      if (!user.parsingConfig || !user.parsingConfig.isActive || !user.parsingConfig.refreshToken) {
+        continue; // Skip users who haven't linked a dedicated parsing account
+      }
+
+      console.log(`Checking emails for user ${user.name} (Parsing Email: ${user.parsingConfig.email})`);
+
+      // 3. Get Client using stored Refresh Token
+      const gmail = await getGmailClient(user.parsingConfig.refreshToken);
       if (!gmail) continue;
 
       try {
@@ -103,7 +109,7 @@ export const checkEmailsAndSync = action({
           });
 
           const subjectHeader = email.data.payload?.headers?.find(h => h.name === "Subject");
-          const subject = subjectHeader?.value || "New Placement Email";
+          const subject = subjectHeader?.value || "New Company";
           
           // Extract Body 
            const body = getBody(email.data.payload);

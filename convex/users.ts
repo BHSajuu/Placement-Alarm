@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internalQuery, mutation} from "./_generated/server";
+import { internalMutation, internalQuery, mutation, query} from "./_generated/server";
 
 
 export const syncUser = mutation({
@@ -45,4 +45,75 @@ export const getAllUsersInternal = internalQuery({
   handler: async (ctx) => {
     return await ctx.db.query("users").collect();
   },
+});
+
+
+export const getUser = query({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    
+    // 1. Check if authenticated
+    if (!identity) {
+      return null;
+    }
+
+    // 2. Security: Ensure user is only fetching their own data
+    if (identity.subject !== args.userId) {
+      throw new Error("Unauthorized request");
+    }
+
+    // 3. Fetch user data (includes parsingConfig)
+    return await ctx.db
+      .query("users")
+      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+      .unique();
+  },
+});
+
+// 1. Internal Mutation to Save/Update Credentials (called by googleAuth action)
+export const saveParsingCredentials = internalMutation({
+  args: { 
+    userId: v.string(), 
+    email: v.string(), 
+    refreshToken: v.string() 
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+      .first();
+
+    if (!user) throw new Error("User not found");
+
+    await ctx.db.patch(user._id, {
+      parsingConfig: {
+        email: args.email,
+        refreshToken: args.refreshToken,
+        isActive: true,
+        lastSyncedAt: new Date().toISOString(),
+      },
+    });
+  },
+});
+
+// 2. Public Mutation to disconnect (called by Frontend)
+export const disconnectParsing = mutation({
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    
+    if (!identity || identity.subject !== args.userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+      .first();
+      
+    if (user) {
+      await ctx.db.patch(user._id, { parsingConfig: undefined });
+    }
+  }
 });

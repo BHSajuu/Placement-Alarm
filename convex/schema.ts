@@ -6,6 +6,12 @@ export default defineSchema({
             userId: v.string(), 
             email: v.string(),
             name: v.string(),
+            parsingConfig: v.optional(v.object({
+            email: v.string(), // The email being parsed (can be different from main email)
+            refreshToken: v.string(), // Critical for background jobs
+            lastSyncedAt: v.optional(v.string()),
+            isActive: v.boolean(),
+         })),
       }).index("by_user_id", ["userId"]),
 
       companies: defineTable({

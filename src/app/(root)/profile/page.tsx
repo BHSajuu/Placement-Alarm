@@ -1,12 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react" // Added useRef
 import { SignedIn, SignOutButton, useUser } from "@clerk/nextjs"
-import { useMutation, useQuery } from "convex/react"
+import { useMutation, useQuery, useAction } from "convex/react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { User, Mail, Edit3, Save, X,  ArrowLeft, Shield, Bell, Camera, Loader } from "lucide-react"
+import { 
+  User, 
+  Mail, 
+  Edit3, 
+  Save, 
+  X,  
+  ArrowLeft, 
+  Shield, 
+  Bell, 
+  Camera, 
+  Loader, 
+  Link as LinkIcon, 
+  Unlink 
+} from "lucide-react"
 import toast from "react-hot-toast"
 import Image from "next/image"
 import Link from "next/link"
@@ -16,21 +30,40 @@ import LoadingSkeleton from "@/components/profile/loading-skeleton"
 
 export default function Profile() {
   const { user, isLoaded } = useUser()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   const [isEditing, setIsEditing] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [isLinking, setIsLinking] = useState(false)
+  
+  // FIX: Ref to prevent double-execution in Strict Mode
+  const processedCode = useRef<string | null>(null)
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
   })
 
-const profile = useQuery(
+  // --- Convex Hooks ---
+  const profile = useQuery(
     api.profiles.getUserProfile,
+    user?.id ? { userId: user.id } : "skip"
+  )
+
+  const userData = useQuery(
+    api.users.getUser, 
     user?.id ? { userId: user.id } : "skip"
   )
 
   const upsertProfile = useMutation(api.profiles.upsertProfile)
   const updateProfileImage = useMutation(api.profiles.updateProfileImage)
-  const generateUploadUrl = useMutation(api.profiles.generateUploadUrl);
+  const generateUploadUrl = useMutation(api.profiles.generateUploadUrl)
+
+  // --- Google OAuth Actions ---
+  const getGoogleAuthUrl = useAction(api.googleAuth.getAuthUrl)
+  const exchangeCode = useAction(api.googleAuth.exchangeCodeAndSave)
+  const disconnectParsing = useMutation(api.users.disconnectParsing)
 
   useEffect(() => {
     if (profile) {
@@ -40,6 +73,61 @@ const profile = useQuery(
       })
     }
   }, [profile])
+
+  // --- OAuth Callback Handler (UPDATED) ---
+  useEffect(() => {
+    const code = searchParams.get("code")
+    
+    // Check if code exists AND we haven't processed this specific code yet
+    if (code && user?.id && !isLinking && processedCode.current !== code) {
+      
+      // Mark this code as processed immediately
+      processedCode.current = code;
+
+      const handleOAuth = async () => {
+        setIsLinking(true)
+        const toastId = toast.loading("Linking Google Account for parsing...")
+        try {
+          await exchangeCode({ code, userId: user.id })
+          toast.success("Email parsing enabled successfully!", { id: toastId })
+          // Clean the URL
+          router.replace("/profile")
+        } catch (error) {
+          console.error("OAuth Error:", error)
+          // If it fails, allow retry (optional, but good for debugging)
+          processedCode.current = null; 
+          toast.error("Failed to link account. Please try again.", { id: toastId })
+        } finally {
+          setIsLinking(false)
+        }
+      }
+      handleOAuth()
+    }
+  }, [searchParams, user, exchangeCode, router, isLinking]) // Removed explicit dependencies causing loops
+
+  // --- Handlers ---
+
+  const handleLinkGoogle = async () => {
+    try {
+      const url = await getGoogleAuthUrl()
+      window.location.href = url
+    } catch (error) {
+      console.error(error)
+      toast.error("Failed to start linking process")
+    }
+  }
+
+  const handleUnlinkGoogle = async () => {
+    if (!user?.id) return
+    const toastId = toast.loading("Disconnecting parsing account...")
+    try {
+      await disconnectParsing({ userId: user.id })
+      toast.success("Account disconnected", { id: toastId })
+    } catch (error) {
+      console.error(error)
+      toast.error("Failed to disconnect", { id: toastId })
+    }
+  }
 
   const handleSave = async () => {
     if (!user) return
@@ -69,7 +157,7 @@ const profile = useQuery(
     setIsEditing(false)
   }
  
-const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user?.id) return;
 
@@ -77,20 +165,16 @@ const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => 
     const toastId = toast.loading("Uploading image...");
 
     try {
-      // 1. Get the upload URL from Convex
       const postUrl = await generateUploadUrl();
-
-      // 2. Upload the file to that URL using 'fetch'
       const result = await fetch(postUrl, {
         method: "POST",
         headers: { "Content-Type": file.type },
         body: file,
       });
 
-      // 3. Get the storageId from the response
-      const { storageId } = await result.json();
+      if (!result.ok) throw new Error("Upload failed");
 
-      // 4. Save the new storageId to the user's profile
+      const { storageId } = await result.json();
       await updateProfileImage({ 
         userId: user.id, 
         storageId: storageId 
@@ -282,6 +366,59 @@ const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => 
                 />
               </div>
             </div>
+
+            {/* Email Parsing Configuration Section */}
+            <div className="mt-8 pt-8 border-t border-gray-700/50">
+              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <Mail className="h-5 w-5 text-purple-400" />
+                Email Parsing Configuration
+              </h2>
+              
+              <div className="bg-gray-700/20 rounded-xl p-6 border border-gray-600/30">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium mb-1 text-lg">
+                      Placement Email Source
+                    </h3>
+                    <p className="text-sm text-gray-400">
+                      {userData?.parsingConfig?.isActive 
+                        ? `Parsing emails enabled for: ${userData.parsingConfig.email}`
+                        : "Link a Google account to automatically detect placement emails."}
+                    </p>
+                    {userData?.parsingConfig?.isActive && userData?.parsingConfig?.lastSyncedAt && (
+                       <p className="text-xs text-gray-500 mt-1">
+                          Last synced: {new Date(userData.parsingConfig.lastSyncedAt).toLocaleString()}
+                       </p>
+                    )}
+                  </div>
+
+                  {userData?.parsingConfig?.isActive ? (
+                    <Button 
+                      onClick={handleUnlinkGoogle}
+                      variant="destructive"
+                      className="bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/50 shadow-lg hover:shadow-red-900/20 rounded-full px-6"
+                    >
+                      <Unlink className="h-4 w-4 mr-2" />
+                      Disconnect
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={handleLinkGoogle}
+                      className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-500/20 rounded-full px-6"
+                      disabled={isLinking}
+                    >
+                      {isLinking ? (
+                        <Loader className="h-4 w-4 animate-spin mr-2" /> 
+                      ) : (
+                        <LinkIcon className="h-4 w-4 mr-2" />
+                      )}
+                      Link Gmail Account
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Info Card */}
             <ProfileInfoCard />
           </div>
