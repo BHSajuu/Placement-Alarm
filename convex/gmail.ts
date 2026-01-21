@@ -91,7 +91,7 @@ export const checkEmailsAndSync = action({
         //  Search for unread emails from the college domain
         const res = await gmail.users.messages.list({
           userId: "me",
-          q: "from:*.nits.ac.in is:unread", // Filter by domain and unread status
+          q: "from:*.nits.ac.in is:unread newer_than:1d", // Filter by domain, unread status and recent emails
           maxResults: 5, // Process a few at a time to stay in free limits
         });
 
