@@ -1,3 +1,4 @@
+
 "use node";
 
 import { google } from "googleapis";
@@ -12,7 +13,6 @@ async function getGoogleCalendarClient(userId: string) {
       }
 
       // 1. Fetch the Google OAuth Token from Clerk
-      // Note: "oauth_google" is the standard provider ID in Clerk for Google
       const res = await fetch(
             `https://api.clerk.com/v1/users/${userId}/oauth_access_tokens/oauth_google`,
             {
@@ -24,7 +24,6 @@ async function getGoogleCalendarClient(userId: string) {
           return null;
       }
       const data = await res.json();
-      // Clerk returns an array of tokens. We take the first valid one.
       const tokenData = data[0];
 
       if (!tokenData || !tokenData.token) {
@@ -39,7 +38,16 @@ async function getGoogleCalendarClient(userId: string) {
       return google.calendar({ version: "v3", auth: oauth2Client });
 }
 
-// ACTION: Sync the main Company Deadline
+// Helper to shift the date by +5.5 hours (IST Offset)
+function getShiftedDate(dateString: string) {
+    const date = new Date(dateString);
+    // Add 5 hours and 30 minutes
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const shiftedDate = new Date(date.getTime() + istOffset);
+    return shiftedDate.toISOString();
+}
+
+// Sync the main Company Deadline
 export const createDeadlineEvent = action({
       args:{
             companyId: v.id("companies"),
@@ -55,15 +63,21 @@ export const createDeadlineEvent = action({
             return;
          }
 
+         // Shift the time forward by 5.5 hours so it looks like IST time in UTC view
+         const startDateTime = getShiftedDate(args.deadline);
+         
+         // Calculate end time (start time + 1 hour)
+         const startDateObj = new Date(startDateTime);
+         const endDateTime = new Date(startDateObj.getTime() + 60 * 60 * 1000).toISOString();
+
          const event = {
             summary: `Deadline: ${args.role} @ ${args.companyName}`,
             description: `Application deadline for ${args.role} at ${args.companyName}. Managed by Placement Alarm.`,
             start: {
-            dateTime: new Date(args.deadline).toISOString(),
+                dateTime: startDateTime,
             },
             end: {
-            // Set event to last 1 hour by default
-            dateTime: new Date(new Date(args.deadline).getTime() + 60 * 60 * 1000).toISOString(),
+                dateTime: endDateTime,
             },
          };
 
@@ -72,7 +86,7 @@ export const createDeadlineEvent = action({
                  calendarId: "primary",
                  requestBody: event,
            });
-           // Save the Google Event ID back to Convex so we can update it later if needed
+           
           if (res.data.id) {
                  await ctx.runMutation((internal as any).companies.setDeadlineGoogleEventId, {
                  companyId: args.companyId,
@@ -85,12 +99,12 @@ export const createDeadlineEvent = action({
       }
 });
 
-// ACTION: Sync Status Events (Interviews, OA, etc.)
+// Sync Status Events (Interviews, OA, etc.)
 export const createStatusEvent = action({
   args: {
     statusEventId: v.id("statusEvents"),
     companyName: v.string(),
-    title: v.string(), // e.g. "Interview" or "OA"
+    title: v.string(), 
     date: v.string(),
     userId: v.string(),
   },
@@ -98,14 +112,21 @@ export const createStatusEvent = action({
     const calendar = await getGoogleCalendarClient(args.userId);
     if (!calendar) return;
 
+    // Shift the time forward by 5.5 hours
+    const startDateTime = getShiftedDate(args.date);
+    
+    // Calculate end time
+    const startDateObj = new Date(startDateTime);
+    const endDateTime = new Date(startDateObj.getTime() + 60 * 60 * 1000).toISOString();
+
     const event = {
       summary: `${args.title}: ${args.companyName}`,
       description: `Scheduled ${args.title} for ${args.companyName}.`,
       start: {
-        dateTime: new Date(args.date).toISOString(),
+        dateTime: startDateTime,
       },
       end: {
-        dateTime: new Date(new Date(args.date).getTime() + 60 * 60 * 1000).toISOString(),
+        dateTime: endDateTime,
       },
     };
 
@@ -127,7 +148,7 @@ export const createStatusEvent = action({
   },
 });
 
-// ACTION: Delete an event from Google Calendar
+// Delete an event from Google Calendar
 export const deleteEvent = action({
   args: {
     googleEventId: v.string(),
@@ -144,7 +165,6 @@ export const deleteEvent = action({
       });
       console.log(`Deleted Google Calendar event: ${args.googleEventId}`);
     } catch (error) {
-      // It's possible the user already deleted it manually, so we just log it.
       console.error("Error deleting Google Calendar event:", error);
     }
   },
