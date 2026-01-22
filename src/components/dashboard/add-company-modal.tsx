@@ -40,15 +40,13 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const addCompany = useMutation(api.companies.addCompany);
-
- const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     let finalDeadline = "";
 
     //  Always reconstruct the date to ensure UTC conversion
     if (deadlineDate) {
-      // 1. Parse the YYYY-MM-DD input
       const [year, month, day] = deadlineDate.split("-").map(Number);
       
       let hour = 0;
@@ -56,24 +54,25 @@ export function AddCompanyModal({ isOpen, onClose }: AddCompanyModalProps) {
       let second = 0;
 
       if (timeHour && timeMinute) {
-        // Case A: User picked a specific time
         hour = parseInt(timeHour);
         minute = parseInt(timeMinute);
         if (timeAmPm === "PM" && hour !== 12) hour += 12;
         if (timeAmPm === "AM" && hour === 12) hour = 0;
       } else {
-        // Case B: User left time empty -> End of Day (23:59:59)
         hour = 23;
         minute = 59;
         second = 59;
       }
 
-      // 2. Create a Date object (Uses your Browser's Local Timezone)
-      // Note: Month is 0-indexed in JavaScript Date
-      const localDate = new Date(year, month - 1, day, hour, minute, second);
-
-      // 3. Convert to UTC ISO String (e.g., "2025-01-22T16:30:00.000Z")
-      finalDeadline = localDate.toISOString(); 
+      // FIX: Interpret input as IST (UTC+5:30) regardless of system timezone
+      // 1. Create a UTC date with the visual components entered by the user
+      const istDate = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+      
+      // 2. Subtract 5 hours 30 minutes (19800000 ms) to get the actual UTC timestamp
+      //    Example: User enters 03:35 IST -> We want 22:05 UTC (prev day)
+      const utcDate = new Date(istDate.getTime() - (5.5 * 60 * 60 * 1000));
+      
+      finalDeadline = utcDate.toISOString(); 
     }
 
     if (!formData.name || !formData.role || !formData.package || !formData.driveType || !finalDeadline || !formData.type) {
